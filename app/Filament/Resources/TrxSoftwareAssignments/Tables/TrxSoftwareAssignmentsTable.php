@@ -18,20 +18,37 @@ class TrxSoftwareAssignmentsTable
 
                 TextColumn::make('asset.NoAssetIT')
                     ->label('Asset')
-                    ->searchable(),
+                    ->formatStateUsing(function ($state, $record) {
+                        return "{$record->asset->NoAssetIT} | {$record->asset->Nama}";
+                    })
+                    ->searchable(['asset.NoAssetIT', 'asset.Nama']),
 
-                TextColumn::make('license.software.NamaSoftware')
-                    ->label('Software')
-                    ->searchable(),
+                TextColumn::make('license.IDLicense')
+                    ->label('Software License')
+                    ->formatStateUsing(function ($state, $record) {
+                        $software = $record->license->software->NamaSoftware ?? '-';
+                        $key = $record->license->ProductKey ?? '-';
+
+                        return "{$software} | {$record->license->IDLicense}";
+                    })
+                    ->searchable([
+                        'license.IDLicense',
+                        'license.ProductKey',
+                        'license.software.NamaSoftware',
+                    ])
+                    ->wrap(),
 
                 TextColumn::make('license.TipeLisensi')
-                    ->label('License'),
+                    ->label('License Type')
+                    ->sortable(),
 
                 TextColumn::make('TanggalAssign')
+                    ->label('Assign Date')
                     ->date()
                     ->sortable(),
 
                 TextColumn::make('TanggalRevoke')
+                    ->label('Revoke Date')
                     ->date()
                     ->sortable(),
 
@@ -41,7 +58,6 @@ class TrxSoftwareAssignmentsTable
                         'warning' => 'Expired',
                         'danger' => 'Revoked',
                     ]),
-
             ])
 
             ->filters([

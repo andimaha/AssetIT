@@ -13,11 +13,16 @@ class MstLokasi extends Model
     public $timestamps=false;
 
     protected $fillable=[
-        'NamaLokasi'
+        'NamaLokasi',
+        'Keterangan'
     ];
+
 
     public function mutasi()
     {
-        return $this->hasMany(TrxMutasiAsset::class,'IDLokasi');
+        return $this->hasMany(
+            TrxMutasiAsset::class,
+            'IDLokasi'
+        );
     }
 }

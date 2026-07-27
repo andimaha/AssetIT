@@ -17,14 +17,21 @@ class TrxSoftwareAssignmentForm
                 Select::make('NoAssetIT')
                     ->label('Asset')
                     ->relationship('asset', 'NoAssetIT')
-                    ->searchable()
+                    ->getOptionLabelFromRecordUsing(fn($record) => "{$record->NoAssetIT} - {$record->Nama}")
+                    ->searchable(['NoAssetIT', 'Nama'])
                     ->preload()
                     ->required(),
 
                 Select::make('IDLicense')
-                    ->label('License')
+                    ->label('Software License')
                     ->relationship('license', 'ProductKey')
-                    ->searchable()
+                    ->getOptionLabelFromRecordUsing(function ($record) {
+                        $software = $record->software?->NamaSoftware ?? '-';
+                        $key = $record->ProductKey ?? '-';
+
+                        return "{$software} | {$record->IDLicense} | {$key}";
+                    })
+                    ->searchable(['IDLicense', 'ProductKey'])
                     ->preload()
                     ->required(),
 

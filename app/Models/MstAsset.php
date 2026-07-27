@@ -39,14 +39,37 @@ class MstAsset extends Model
         'Garansi',
         'DateWarranty',
         'IDPerusahaan',
+        'NIK',
         'StatusAsset'
     ];
 
     protected $casts = [
         'TanggalBeli' => 'datetime',
         'DateWarranty' => 'datetime',
-        'Harga' => 'decimal:2'
+        'Harga' => 'decimal:2',
+    'Garansi' => 'integer',
     ];
+
+    protected static function boot()
+{
+    parent::boot();
+
+    static::creating(function ($model) {
+
+        if ($model->Garansi === null) {
+            $model->Garansi = 0;
+        }
+
+    });
+
+    static::updating(function ($model) {
+
+        if ($model->Garansi === null) {
+            $model->Garansi = 0;
+        }
+
+    });
+}
 
     public function perusahaan()
     {
@@ -72,6 +95,14 @@ class MstAsset extends Model
             'NoAssetIT'
         );
     }
+    public function karyawan()
+{
+    return $this->belongsTo(
+        MstKaryawan::class,
+        'NIK',
+        'NIK'
+    );
+}
 
     public function service()
     {
@@ -81,6 +112,8 @@ class MstAsset extends Model
             'NoAssetIT'
         );
     }
+
+    
 
     public function retire()
     {
@@ -99,6 +132,8 @@ class MstAsset extends Model
             'NoAssetIT'
         );
     }
+
+    
 
     // public function assignment()
     // {

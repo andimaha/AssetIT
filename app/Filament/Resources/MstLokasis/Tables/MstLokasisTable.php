@@ -16,12 +16,25 @@ class MstLokasisTable
 
             ->columns([
 
+
                 TextColumn::make('NamaLokasi')
                     ->label('Nama Lokasi')
                     ->searchable()
                     ->sortable(),
 
+
+
+                TextColumn::make('Keterangan')
+                    ->label('Keterangan')
+                    ->placeholder('-')
+                    ->searchable()
+                    ->limit(50)
+                    ->wrap()
+                    ->toggleable(),
+
+
             ])
+
 
             ->actions([
 

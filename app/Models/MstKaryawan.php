@@ -61,4 +61,13 @@ class MstKaryawan extends Model
         );
     }
 
+    public function assets()
+{
+    return $this->hasMany(
+        MstAsset::class,
+        'NIK',
+        'NIK'
+    );
+}
+
 }

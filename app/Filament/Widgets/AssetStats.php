@@ -25,13 +25,13 @@ class AssetStats extends StatsOverviewWidget
 
 
             Stat::make(
-                'Asset Used',
+                'Asset Not Used',
                 MstAsset::where(
                     'StatusAsset',
-                    'Used'
+                    'Not Used'
                 )->count()
             )
-            ->description('Asset sedang digunakan')
+            ->description('Asset tidak digunakan')
             ->color('success'),
 
 

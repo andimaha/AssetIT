@@ -32,16 +32,16 @@ class EditMstSoftware extends EditRecord
     /**
      * Widget tampil di bagian atas halaman edit
      */
-    protected function getHeaderWidgets(): array
-    {
+    // protected function getHeaderWidgets(): array
+    // {
 
-        return [
+    //     return [
 
-            SoftwareLicenseSummary::class,
+    //         SoftwareLicenseSummary::class,
 
-        ];
+    //     ];
 
-    }
+    // }
 
 
 

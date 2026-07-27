@@ -42,17 +42,9 @@ class LicenseRelationManager extends RelationManager
     |--------------------------------------------------------------------------
     */
 
-    public static function isCollapsible(): bool
-    {
-        return true;
-    }
+    protected static bool $isCollapsible = true;
 
-
-
-    public static function isCollapsed(): bool
-    {
-        return false;
-    }
+    protected static bool $isCollapsed = true;
 
 
 
@@ -104,6 +96,7 @@ class LicenseRelationManager extends RelationManager
                         'OLP' => 'OLP',
                         'Volume' => 'Volume',
                         'Subscription' => 'Subscription',
+                        'FPP' => 'FPP',
 
                     ]),
 

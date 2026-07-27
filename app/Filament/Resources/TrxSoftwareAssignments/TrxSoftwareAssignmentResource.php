@@ -15,7 +15,7 @@ use Filament\Tables\Table;
 class TrxSoftwareAssignmentResource extends Resource
 {
     protected static ?string $model = TrxSoftwareAssignment::class;
-    protected static bool $shouldRegisterNavigation = false;
+    protected static bool $shouldRegisterNavigation = true;
 
     protected static ?string $navigationLabel = 'Software Assignment';
 

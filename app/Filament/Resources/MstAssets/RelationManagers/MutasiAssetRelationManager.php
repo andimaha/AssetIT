@@ -62,6 +62,7 @@ class MutasiAssetRelationManager extends RelationManager
 
 
                 DateTimePicker::make('TanggalMutasi')
+                    ->label('Tanggal Mutasi')
                     ->default(now())
                     ->required(),
 
@@ -82,11 +83,21 @@ class MutasiAssetRelationManager extends RelationManager
 
 
 
+
+
     public function table(Table $table): Table
     {
         return $table
 
+
             ->recordTitleAttribute('NIK')
+
+
+            ->defaultSort(
+                'TanggalMutasi',
+                'desc'
+            )
+
 
             ->columns([
 
@@ -114,32 +125,174 @@ class MutasiAssetRelationManager extends RelationManager
 
 
                 TextColumn::make('TanggalMutasi')
-                    ->dateTime(),
-
+                    ->label('Tanggal Mutasi')
+                    ->dateTime()
+                    ->sortable(),
+                
+                TextColumn::make('Keterangan')
+        ->label('Keterangan')
+        ->placeholder('-')
+        ->wrap()
+        ->searchable(),
 
 
             ])
+
+
+
+
 
 
 
             ->headerActions([
-                CreateAction::make(),
+
+
+
+                CreateAction::make()
+
+                    ->after(function ($record, RelationManager $livewire) {
+
+
+                        $asset = $livewire->getOwnerRecord();
+
+
+
+                        // Ambil mutasi dengan tanggal paling akhir
+                        $lastMutation = $asset
+                            ->mutasiAsset()
+                            ->orderByDesc('TanggalMutasi')
+                            ->first();
+
+
+
+                        $asset->update([
+
+                            'NIK' => $lastMutation?->NIK,
+
+                        ]);
+
+
+
+                        $livewire->dispatch(
+                            'refreshAssetForm'
+                        );
+
+
+                    }),
+
+
+
             ])
+
+
+
+
+
+
 
 
 
             ->recordActions([
-                EditAction::make(),
-                DeleteAction::make(),
+
+
+
+                EditAction::make()
+
+                    ->after(function ($record, RelationManager $livewire) {
+
+
+                        $asset = $livewire->getOwnerRecord();
+
+
+
+                        // Cari ulang berdasarkan tanggal mutasi terbaru
+                        // bukan berdasarkan data yang diedit
+
+                        $lastMutation = $asset
+                            ->mutasiAsset()
+                            ->orderByDesc('TanggalMutasi')
+                            ->first();
+
+
+
+                        $asset->update([
+
+                            'NIK' => $lastMutation?->NIK,
+
+                        ]);
+
+
+
+                        $livewire->dispatch(
+                            'refreshAssetForm'
+                        );
+
+
+                    }),
+
+
+
+
+
+
+
+                DeleteAction::make()
+
+                    ->after(function ($record, RelationManager $livewire) {
+
+
+                        $asset = $livewire->getOwnerRecord();
+
+
+
+                        // Setelah delete cari histori terakhir
+
+                        $lastMutation = $asset
+                            ->mutasiAsset()
+                            ->orderByDesc('TanggalMutasi')
+                            ->first();
+
+
+
+                        $asset->update([
+
+                            'NIK' => $lastMutation?->NIK,
+
+                        ]);
+
+
+
+                        $livewire->dispatch(
+                            'refreshAssetForm'
+                        );
+
+
+                    }),
+
+
+
             ])
 
 
 
+
+
+
+
+
+
             ->toolbarActions([
+
+
                 BulkActionGroup::make([
+
                     DeleteBulkAction::make(),
+
                 ]),
+
+
             ]);
+
 
     }
 

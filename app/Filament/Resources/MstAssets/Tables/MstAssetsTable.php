@@ -14,6 +14,12 @@ class MstAssetsTable
     public static function configure(Table $table): Table
     {
         return $table
+
+            ->defaultSort(
+                'TanggalBeli',
+                'desc'
+            )
+
             ->columns([
 
                 TextColumn::make('NoAssetIT')
@@ -84,7 +90,7 @@ class MstAssetsTable
                 TextColumn::make('StatusBeli')
                     ->label('STATUS PEMBELIAN')
                     ->badge()
-                    ->color(fn (string $state) => match ($state) {
+                    ->color(fn(string $state) => match ($state) {
                         'Baru' => 'success',
                         'Second' => 'warning',
                         default => 'gray',
@@ -113,7 +119,7 @@ class MstAssetsTable
                             : 'Tidak Ada';
                     })
                     ->badge()
-                    ->color(fn ($state) => ($state && $state > 0) ? 'success' : 'danger'),
+                    ->color(fn($state) => ($state && $state > 0) ? 'success' : 'danger'),
 
                 TextColumn::make('DateWarranty')
                     ->label('BERAKHIR GARANSI')
@@ -126,10 +132,43 @@ class MstAssetsTable
                     ->searchable()
                     ->sortable(),
 
+                TextColumn::make('pemegang_asset')
+    ->label('PEMEGANG ASSET')
+    ->state(function ($record) {
+
+        $mutasiTerakhir = $record
+            ->mutasiAsset()
+            ->with([
+                'karyawan',
+                'lokasi'
+            ])
+            ->orderByDesc('TanggalMutasi')
+            ->first();
+
+
+        if (!$mutasiTerakhir || !$mutasiTerakhir->karyawan) {
+            return '-';
+        }
+
+
+        $nama = $mutasiTerakhir->karyawan->Nama;
+
+
+        $lokasi = $mutasiTerakhir->lokasi?->NamaLokasi;
+
+
+        return $lokasi
+            ? "{$nama} - {$lokasi}"
+            : $nama;
+
+    })
+    ->placeholder('-'),
+
                 TextColumn::make('StatusAsset')
                     ->label('STATUS ASSET')
                     ->badge()
-                    ->color(fn (string $state) => match ($state) {
+                    ->searchable()
+                    ->color(fn(string $state) => match ($state) {
                         'Available' => 'success',
                         'In Service' => 'warning',
                         'Retired' => 'danger',
