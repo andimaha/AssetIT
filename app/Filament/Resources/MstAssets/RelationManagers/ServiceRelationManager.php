@@ -90,6 +90,9 @@ class ServiceRelationManager extends RelationManager
 
                 TextColumn::make('Kerusakan')
                     ->limit(40),
+                    
+                TextColumn::make('Tindakan')
+                    ->limit(40),
 
                 TextColumn::make('vendor.NamaVendor')
                     ->label('Vendor'),

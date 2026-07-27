@@ -40,6 +40,7 @@ class MstAsset extends Model
         'DateWarranty',
         'IDPerusahaan',
         'NIK',
+    'IDLokasi',
         'StatusAsset'
     ];
 
@@ -69,6 +70,15 @@ class MstAsset extends Model
         }
 
     });
+}
+
+public function lokasi()
+{
+    return $this->belongsTo(
+        MstLokasi::class,
+        'IDLokasi',
+        'IDLokasi'
+    );
 }
 
     public function perusahaan()

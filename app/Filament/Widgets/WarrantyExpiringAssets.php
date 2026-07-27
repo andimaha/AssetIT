@@ -3,52 +3,164 @@
 namespace App\Filament\Widgets;
 
 use App\Models\MstAsset;
+
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
 
+use Carbon\Carbon;
+
+
 class WarrantyExpiringAssets extends BaseWidget
 {
+
     protected static ?string $heading = 'Warranty Akan Habis';
+
+
 
     public function table(Table $table): Table
     {
         return $table
+
             ->query(
+
                 MstAsset::query()
+
                     ->whereNotNull('DateWarranty')
-                    ->whereDate('DateWarranty', '>=', now()) // Belum expired
-                    ->whereDate('DateWarranty', '<=', now()->addMonth()) // Maksimal 1 bulan lagi
-                    ->orderBy('DateWarranty', 'asc') // Yang paling dekat habis di atas
+
+                    ->whereDate(
+                        'DateWarranty',
+                        '>=',
+                        now()
+                    )
+
+                    ->whereDate(
+                        'DateWarranty',
+                        '<=',
+                        now()->addMonth()
+                    )
+
+                    ->orderBy(
+                        'DateWarranty',
+                        'asc'
+                    )
+
             )
 
+
             ->columns([
+
+
+
                 Tables\Columns\TextColumn::make('NoAssetIT')
-                    ->label('No Asset')
-                    ->searchable(),
+                    ->label('NO ASSET')
+                    ->searchable()
+                    ->sortable(),
+
+
+
 
                 Tables\Columns\TextColumn::make('Nama')
-                    ->label('Nama Asset')
-                    ->searchable(),
+                    ->label('NAMA ASSET')
+                    ->searchable()
+                    ->sortable(),
+
+
+
 
                 Tables\Columns\TextColumn::make('perusahaan.NamaPerusahaan')
-                    ->label('Perusahaan')
+                    ->label('PERUSAHAAN')
                     ->searchable(),
 
+
+
+
+                Tables\Columns\TextColumn::make('karyawan.Nama')
+                    ->label('PEMEGANG')
+                    ->placeholder('-')
+                    ->searchable(),
+
+
+
+
+                Tables\Columns\TextColumn::make('lokasi.NamaLokasi')
+                    ->label('LOKASI')
+                    ->placeholder('-')
+                    ->searchable(),
+
+
+
+
                 Tables\Columns\TextColumn::make('DateWarranty')
-                    ->label('Warranty')
+                    ->label('BERAKHIR WARRANTY')
                     ->date('d M Y')
                     ->sortable(),
 
+
+
+
+
                 Tables\Columns\TextColumn::make('DateWarranty')
-                    ->label('Sisa Hari')
+
+                    ->label('SISA HARI')
+
                     ->badge()
-                    ->color(fn ($record) => match (true) {
-                        now()->diffInDays($record->DateWarranty, false) <= 7 => 'danger',
-                        now()->diffInDays($record->DateWarranty, false) <= 14 => 'warning',
-                        default => 'success',
+
+
+                    ->state(function ($record) {
+
+
+                        $hari = now()
+
+                            ->floatDiffInDays(
+                                Carbon::parse(
+                                    $record->DateWarranty
+                                ),
+                                false
+                            );
+
+
+                        return (int) ceil($hari);
+
+
                     })
-                    ->formatStateUsing(fn ($state) => now()->diffInDays($state) . ' Hari Lagi'),
+
+
+                    ->formatStateUsing(function ($state) {
+
+
+                        return $state . ' Hari Lagi';
+
+
+                    })
+
+
+                    ->color(function ($state) {
+
+
+                        return match (true) {
+
+
+                            $state <= 7 =>
+                                'danger',
+
+
+                            $state <= 14 =>
+                                'warning',
+
+
+                            default =>
+                                'success',
+
+
+                        };
+
+
+                    }),
+
+
             ]);
+
     }
+
 }

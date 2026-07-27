@@ -132,37 +132,19 @@ class MstAssetsTable
                     ->searchable()
                     ->sortable(),
 
-                TextColumn::make('pemegang_asset')
-    ->label('PEMEGANG ASSET')
-    ->state(function ($record) {
+                TextColumn::make('karyawan.Nama')
+                    ->label('PEMEGANG ASSET')
+                    ->placeholder('-')
+                    ->searchable()
+                    ->sortable(),
 
-        $mutasiTerakhir = $record
-            ->mutasiAsset()
-            ->with([
-                'karyawan',
-                'lokasi'
-            ])
-            ->orderByDesc('TanggalMutasi')
-            ->first();
+                    TextColumn::make('lokasi.NamaLokasi')
+    ->label('LOKASI ASSET')
+    ->placeholder('-')
+    ->searchable()
+    ->sortable(),
 
-
-        if (!$mutasiTerakhir || !$mutasiTerakhir->karyawan) {
-            return '-';
-        }
-
-
-        $nama = $mutasiTerakhir->karyawan->Nama;
-
-
-        $lokasi = $mutasiTerakhir->lokasi?->NamaLokasi;
-
-
-        return $lokasi
-            ? "{$nama} - {$lokasi}"
-            : $nama;
-
-    })
-    ->placeholder('-'),
+                
 
                 TextColumn::make('StatusAsset')
                     ->label('STATUS ASSET')

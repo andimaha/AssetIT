@@ -52,7 +52,8 @@ class MutasiAssetRelationManager extends RelationManager
                         'NamaLokasi'
                     )
                     ->searchable()
-                    ->preload(),
+                    ->preload()
+                    ->required(),
 
 
 
@@ -74,7 +75,8 @@ class MutasiAssetRelationManager extends RelationManager
                 TextInput::make('AksesEmail'),
 
 
-                TextInput::make('Keterangan'),
+                TextInput::make('Keterangan')
+                    ->label('Keterangan'),
 
             ]);
     }
@@ -84,11 +86,9 @@ class MutasiAssetRelationManager extends RelationManager
 
 
 
-
     public function table(Table $table): Table
     {
         return $table
-
 
             ->recordTitleAttribute('NIK')
 
@@ -120,7 +120,8 @@ class MutasiAssetRelationManager extends RelationManager
 
 
                 TextColumn::make('lokasi.NamaLokasi')
-                    ->label('Lokasi'),
+                    ->label('Lokasi')
+                    ->searchable(),
 
 
 
@@ -128,12 +129,14 @@ class MutasiAssetRelationManager extends RelationManager
                     ->label('Tanggal Mutasi')
                     ->dateTime()
                     ->sortable(),
-                
+
+
+
                 TextColumn::make('Keterangan')
-        ->label('Keterangan')
-        ->placeholder('-')
-        ->wrap()
-        ->searchable(),
+                    ->label('Keterangan')
+                    ->placeholder('-')
+                    ->wrap()
+                    ->searchable(),
 
 
             ])
@@ -143,9 +146,7 @@ class MutasiAssetRelationManager extends RelationManager
 
 
 
-
             ->headerActions([
-
 
 
                 CreateAction::make()
@@ -156,20 +157,7 @@ class MutasiAssetRelationManager extends RelationManager
                         $asset = $livewire->getOwnerRecord();
 
 
-
-                        // Ambil mutasi dengan tanggal paling akhir
-                        $lastMutation = $asset
-                            ->mutasiAsset()
-                            ->orderByDesc('TanggalMutasi')
-                            ->first();
-
-
-
-                        $asset->update([
-
-                            'NIK' => $lastMutation?->NIK,
-
-                        ]);
+                        $this->updateLatestMutation($asset);
 
 
 
@@ -181,11 +169,7 @@ class MutasiAssetRelationManager extends RelationManager
                     }),
 
 
-
             ])
-
-
-
 
 
 
@@ -204,22 +188,7 @@ class MutasiAssetRelationManager extends RelationManager
                         $asset = $livewire->getOwnerRecord();
 
 
-
-                        // Cari ulang berdasarkan tanggal mutasi terbaru
-                        // bukan berdasarkan data yang diedit
-
-                        $lastMutation = $asset
-                            ->mutasiAsset()
-                            ->orderByDesc('TanggalMutasi')
-                            ->first();
-
-
-
-                        $asset->update([
-
-                            'NIK' => $lastMutation?->NIK,
-
-                        ]);
+                        $this->updateLatestMutation($asset);
 
 
 
@@ -229,8 +198,6 @@ class MutasiAssetRelationManager extends RelationManager
 
 
                     }),
-
-
 
 
 
@@ -244,21 +211,7 @@ class MutasiAssetRelationManager extends RelationManager
                         $asset = $livewire->getOwnerRecord();
 
 
-
-                        // Setelah delete cari histori terakhir
-
-                        $lastMutation = $asset
-                            ->mutasiAsset()
-                            ->orderByDesc('TanggalMutasi')
-                            ->first();
-
-
-
-                        $asset->update([
-
-                            'NIK' => $lastMutation?->NIK,
-
-                        ]);
+                        $this->updateLatestMutation($asset);
 
 
 
@@ -270,10 +223,7 @@ class MutasiAssetRelationManager extends RelationManager
                     }),
 
 
-
             ])
-
-
 
 
 
@@ -295,5 +245,58 @@ class MutasiAssetRelationManager extends RelationManager
 
 
     }
+
+
+
+
+
+
+    /**
+     * Update pemegang dan lokasi berdasarkan
+     * mutasi dengan TanggalMutasi TERBARU
+     */
+    private function updateLatestMutation($asset): void
+    {
+
+
+        $lastMutation = $asset
+
+            ->mutasiAsset()
+
+            ->orderByDesc('TanggalMutasi')
+
+            ->first();
+
+
+
+        if ($lastMutation) {
+
+
+            $asset->update([
+
+                'NIK' => $lastMutation->NIK,
+
+                'IDLokasi' => $lastMutation->IDLokasi,
+
+            ]);
+
+
+        } else {
+
+
+            $asset->update([
+
+                'NIK' => null,
+
+                'IDLokasi' => null,
+
+            ]);
+
+
+        }
+
+
+    }
+
 
 }
