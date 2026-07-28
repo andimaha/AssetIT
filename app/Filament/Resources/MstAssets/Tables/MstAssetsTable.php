@@ -87,11 +87,7 @@ class MstAssetsTable
                     ->placeholder('-')
                     ->toggleable(),
 
-                TextColumn::make('Keterangan')
-                    ->label('KETERANGAN')
-                    ->placeholder('-')
-                    ->searchable()
-                    ->sortable(),
+                
 
                 TextColumn::make('StatusBeli')
                     ->label('STATUS PEMBELIAN')
@@ -168,6 +164,12 @@ class MstAssetsTable
                         'Retired' => 'danger',
                         default => 'gray',
                     }),
+
+                TextColumn::make('Keterangan')
+                    ->label('KETERANGAN')
+                    ->placeholder('-')
+                    ->searchable()
+                    ->sortable(),
 
             ])
 
