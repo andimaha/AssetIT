@@ -138,13 +138,19 @@ class MstAssetsTable
                     ->searchable()
                     ->sortable(),
 
-                    TextColumn::make('lokasi.NamaLokasi')
-    ->label('LOKASI ASSET')
-    ->placeholder('-')
-    ->searchable()
-    ->sortable(),
+                TextColumn::make('karyawan.Departemen.NamaDept')
+                    ->label('PEMEGANG DEPARTEMEN')
+                    ->placeholder('-')
+                    ->searchable()
+                    ->sortable(),
 
-                
+                TextColumn::make('lokasi.NamaLokasi')
+                    ->label('LOKASI ASSET')
+                    ->placeholder('-')
+                    ->searchable()
+                    ->sortable(),
+
+
 
                 TextColumn::make('StatusAsset')
                     ->label('STATUS ASSET')

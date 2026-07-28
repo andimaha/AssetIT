@@ -3,69 +3,206 @@
 namespace App\Filament\Widgets;
 
 use App\Models\MstAsset;
+use App\Models\MstPerusahaan;
+use Filament\Support\RawJs;
 use Filament\Widgets\ChartWidget;
 
 class AssetStatusChart extends ChartWidget
 {
     protected ?string $heading = 'Asset Berdasarkan Status';
 
+
+    // protected static ?int $sort = 2;
+
+
+
+    public ?string $filter = 'all';
+
+
+
+
+    protected function getFilters(): ?array
+    {
+        return [
+
+            'all' => 'Semua Perusahaan',
+
+        ] + MstPerusahaan::query()
+
+            ->orderBy('NamaPerusahaan')
+
+            ->pluck(
+                'NamaPerusahaan',
+                'IDPerusahaan'
+            )
+
+            ->toArray();
+    }
+
+
+
+
+
     protected function getData(): array
     {
-        $data = MstAsset::selectRaw(
-            'StatusAsset, COUNT(*) as total'
-        )
-            ->groupBy('StatusAsset')
-            ->pluck('total', 'StatusAsset');
 
-        $colors = [
-            '#3B82F6', // Blue
-            '#10B981', // Green
-            '#F59E0B', // Amber
-            '#EF4444', // Red
-            '#8B5CF6', // Purple
-            '#06B6D4', // Cyan
-            '#84CC16', // Lime
-            '#F97316', // Orange
-            '#EC4899', // Pink
-            '#14B8A6', // Teal
-            '#6366F1', // Indigo
-            '#A855F7', // Violet
-        ];
+        $query = MstAsset::query();
 
-        $backgroundColors = [];
-        $borderColors = [];
 
-        foreach (array_values($data->toArray()) as $index => $value) {
-            $color = $colors[$index % count($colors)];
 
-            $backgroundColors[] = $color;
-            $borderColors[] = '#FFFFFF';
+        if (
+            $this->filter !== null
+            &&
+            $this->filter !== 'all'
+        ) {
+
+            $query->where(
+                'IDPerusahaan',
+                $this->filter
+            );
+
         }
 
+
+
+        $statuses = [
+
+            'Available',
+
+            'In Service',
+
+            'Not Used',
+
+            'Retired',
+
+        ];
+
+
+
+
+        $result = $query
+
+            ->selectRaw(
+                'StatusAsset, COUNT(*) as total'
+            )
+
+            ->groupBy('StatusAsset')
+
+            ->pluck(
+                'total',
+                'StatusAsset'
+            );
+
+
+
+
+
+
         return [
+
             'datasets' => [
+
                 [
+
                     'label' => 'Jumlah Asset',
-                    'data' => $data->values()->toArray(),
 
-                    // Warna tiap slice
-                    'backgroundColor' => $backgroundColors,
 
-                    // Border putih agar antar slice terlihat jelas
-                    'borderColor' => $borderColors,
+                    'data' => collect($statuses)
+
+                        ->map(
+                            fn ($status) =>
+                            $result[$status] ?? 0
+                        )
+
+                        ->toArray(),
+
+
+
+
+                    'backgroundColor' => [
+
+                        '#10B981',
+
+                        '#F59E0B',
+
+                        '#3B82F6',
+
+                        '#EF4444',
+
+                    ],
+
+
+
+                    'borderColor' => '#FFFFFF',
+
+
                     'borderWidth' => 2,
 
-                    // Efek saat hover
+
                     'hoverOffset' => 12,
+
+
                 ],
+
             ],
 
-            'labels' => $data->keys()->toArray(),
+
+
+            'labels' => $statuses,
+
         ];
+
     }
+
+
+
+
+
 
     protected function getType(): string
     {
         return 'pie';
     }
+
+
+
+
+
+
+
+    protected function getOptions(): RawJs
+{
+    return RawJs::make(<<<'JS'
+
+{
+    onClick(event, elements, chart)
+    {
+        if (!elements.length) {
+            return;
+        }
+
+
+        const index = elements[0].index;
+
+
+        const status = chart.data.labels[index];
+
+
+        console.log('STATUS CLICK:', status);
+
+
+        Livewire.dispatch(
+            'open-asset-detail-modal',
+            {
+                status: status,
+                company: 'all',
+            }
+        );
+
+    }
+}
+
+JS);
+}
+
 }
