@@ -132,6 +132,10 @@ class MstAssetForm
                         TextInput::make('Lapor')
 
                             ->label('Lapor'),
+                        
+                        TextInput::make('Keterangan')
+
+                            ->label('Keterangan'),
 
 
 

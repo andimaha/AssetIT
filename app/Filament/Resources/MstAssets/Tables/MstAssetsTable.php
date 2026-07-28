@@ -87,6 +87,12 @@ class MstAssetsTable
                     ->placeholder('-')
                     ->toggleable(),
 
+                TextColumn::make('Keterangan')
+                    ->label('KETERANGAN')
+                    ->placeholder('-')
+                    ->searchable()
+                    ->sortable(),
+
                 TextColumn::make('StatusBeli')
                     ->label('STATUS PEMBELIAN')
                     ->badge()

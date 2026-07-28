@@ -40,46 +40,47 @@ class MstAsset extends Model
         'DateWarranty',
         'IDPerusahaan',
         'NIK',
-    'IDLokasi',
-        'StatusAsset'
+        'IDLokasi',
+        'StatusAsset',
+        'Keterangan',
     ];
 
     protected $casts = [
         'TanggalBeli' => 'datetime',
         'DateWarranty' => 'datetime',
         'Harga' => 'decimal:2',
-    'Garansi' => 'integer',
+        'Garansi' => 'integer',
     ];
 
     protected static function boot()
-{
-    parent::boot();
+    {
+        parent::boot();
 
-    static::creating(function ($model) {
+        static::creating(function ($model) {
 
-        if ($model->Garansi === null) {
-            $model->Garansi = 0;
-        }
+            if ($model->Garansi === null) {
+                $model->Garansi = 0;
+            }
 
-    });
+        });
 
-    static::updating(function ($model) {
+        static::updating(function ($model) {
 
-        if ($model->Garansi === null) {
-            $model->Garansi = 0;
-        }
+            if ($model->Garansi === null) {
+                $model->Garansi = 0;
+            }
 
-    });
-}
+        });
+    }
 
-public function lokasi()
-{
-    return $this->belongsTo(
-        MstLokasi::class,
-        'IDLokasi',
-        'IDLokasi'
-    );
-}
+    public function lokasi()
+    {
+        return $this->belongsTo(
+            MstLokasi::class,
+            'IDLokasi',
+            'IDLokasi'
+        );
+    }
 
     public function perusahaan()
     {
@@ -106,13 +107,13 @@ public function lokasi()
         );
     }
     public function karyawan()
-{
-    return $this->belongsTo(
-        MstKaryawan::class,
-        'NIK',
-        'NIK'
-    );
-}
+    {
+        return $this->belongsTo(
+            MstKaryawan::class,
+            'NIK',
+            'NIK'
+        );
+    }
 
     public function service()
     {
@@ -123,7 +124,7 @@ public function lokasi()
         );
     }
 
-    
+
 
     public function retire()
     {
@@ -143,7 +144,7 @@ public function lokasi()
         );
     }
 
-    
+
 
     // public function assignment()
     // {
