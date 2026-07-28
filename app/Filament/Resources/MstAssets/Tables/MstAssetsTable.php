@@ -141,7 +141,7 @@ class MstAssetsTable
                     ->sortable(),
 
                 TextColumn::make('karyawan.Departemen.NamaDept')
-                    ->label('PEMEGANG DEPARTEMEN')
+                    ->label('DEPT')
                     ->placeholder('-')
                     ->searchable()
                     ->sortable(),
