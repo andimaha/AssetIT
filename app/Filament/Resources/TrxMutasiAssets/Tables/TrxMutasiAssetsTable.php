@@ -51,7 +51,7 @@ class TrxMutasiAssetsTable
 
 
                 TextColumn::make('TanggalMutasi')
-                    ->dateTime(),
+                    ->date('d M Y'),
 
 
 

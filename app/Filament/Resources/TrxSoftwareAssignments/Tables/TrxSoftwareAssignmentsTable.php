@@ -44,12 +44,12 @@ class TrxSoftwareAssignmentsTable
 
                 TextColumn::make('TanggalAssign')
                     ->label('Assign Date')
-                    ->date()
+                    ->date('d M Y')
                     ->sortable(),
 
                 TextColumn::make('TanggalRevoke')
                     ->label('Revoke Date')
-                    ->date()
+                    ->date('d M Y')
                     ->sortable(),
 
                 BadgeColumn::make('StatusAssignment')

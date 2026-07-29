@@ -71,11 +71,11 @@ class AssignmentRelationManager extends RelationManager
                     ->searchable(),
 
                 TextColumn::make('TanggalAssign')
-                    ->date()
+                    ->date('d M Y')
                     ->sortable(),
 
                 TextColumn::make('TanggalRevoke')
-                    ->date()
+                    ->date('d M Y')
                     ->sortable(),
 
                 BadgeColumn::make('StatusAssignment')

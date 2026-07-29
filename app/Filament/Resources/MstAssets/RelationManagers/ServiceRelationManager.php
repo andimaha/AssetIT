@@ -106,7 +106,7 @@ class ServiceRelationManager extends RelationManager
             ->columns([
 
                 TextColumn::make('TanggalMasuk')
-                    ->dateTime()
+                    ->date('d M Y')
                     ->sortable(),
 
                 TextColumn::make('JenisService')

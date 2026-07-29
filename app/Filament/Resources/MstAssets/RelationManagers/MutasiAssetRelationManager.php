@@ -127,7 +127,7 @@ class MutasiAssetRelationManager extends RelationManager
 
                 TextColumn::make('TanggalMutasi')
                     ->label('Tanggal Mutasi')
-                    ->dateTime()
+                    ->date('d M Y')
                     ->sortable(),
 
 

@@ -71,7 +71,7 @@ class RetireRelationManager extends RelationManager
                     ->searchable(),
 
                 TextColumn::make('TanggalRetire')
-                    ->dateTime()
+                    ->date('d M Y')
                     ->sortable(),
 
                 TextColumn::make('AlasanRetire')
