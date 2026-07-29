@@ -87,7 +87,7 @@ class MstAssetsTable
                     ->placeholder('-')
                     ->toggleable(),
 
-                
+
 
                 TextColumn::make('StatusBeli')
                     ->label('STATUS PEMBELIAN')
@@ -169,7 +169,11 @@ class MstAssetsTable
                     ->label('KETERANGAN')
                     ->placeholder('-')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->wrap()
+                    ->extraAttributes([
+                        'class' => 'max-w-sm',
+                    ]),
 
             ])
 

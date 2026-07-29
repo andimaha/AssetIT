@@ -23,6 +23,30 @@ class ServiceRelationManager extends RelationManager
 {
     protected static string $relationship = 'service';
 
+    /**
+     * Update Status Asset berdasarkan seluruh data service.
+     */
+    protected function updateAssetStatus(RelationManager $livewire): void
+    {
+        $asset = $livewire->getOwnerRecord();
+
+        $services = $asset->service()->get();
+
+        if ($services->where('StatusService', 'Proses')->isNotEmpty()) {
+            $status = 'In Service';
+        } elseif ($services->where('StatusService', 'Unrepairable')->isNotEmpty()) {
+            $status = 'Retired';
+        } else {
+            $status = 'Available';
+        }
+
+        $asset->update([
+            'StatusAsset' => $status,
+        ]);
+
+        $livewire->dispatch('refreshAssetForm');
+    }
+
     public function form(Schema $schema): Schema
     {
         return $schema
@@ -90,7 +114,7 @@ class ServiceRelationManager extends RelationManager
 
                 TextColumn::make('Kerusakan')
                     ->limit(40),
-                    
+
                 TextColumn::make('Tindakan')
                     ->limit(40),
 
@@ -110,14 +134,9 @@ class ServiceRelationManager extends RelationManager
             ->headerActions([
 
                 CreateAction::make()
-    ->after(function ($record, RelationManager $livewire) {
-
-        $livewire->getOwnerRecord()->update([
-            'StatusAsset' => 'In Service',
-        ]);
-
-        $livewire->dispatch('refreshAssetForm');
-    }),
+                    ->after(function ($record, RelationManager $livewire) {
+                        $this->updateAssetStatus($livewire);
+                    }),
 
             ])
 
@@ -125,30 +144,13 @@ class ServiceRelationManager extends RelationManager
 
                 EditAction::make()
                     ->after(function ($record, RelationManager $livewire) {
-
-                        if ($record->StatusService == 'Proses') {
-
-                            $status = 'In Service';
-
-                        } elseif ($record->StatusService == 'Selesai') {
-
-                            $status = 'Available';
-
-                        } else {
-
-                            $status = 'Retired';
-
-                        }
-
-                        $livewire->getOwnerRecord()->update([
-    'StatusAsset' => $status,
-]);
-
-$livewire->dispatch('refreshAssetForm');
-
+                        $this->updateAssetStatus($livewire);
                     }),
 
-                DeleteAction::make(),
+                DeleteAction::make()
+                    ->after(function ($record, RelationManager $livewire) {
+                        $this->updateAssetStatus($livewire);
+                    }),
 
             ])
 
