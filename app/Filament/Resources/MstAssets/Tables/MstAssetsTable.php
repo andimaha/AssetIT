@@ -185,7 +185,14 @@ class MstAssetsTable
 
                 EditAction::make(),
 
-                DeleteAction::make(),
+                DeleteAction::make()
+                    ->before(function ($record) {
+
+                        $record->softwareAssignment()->delete();
+                        $record->service()->delete();
+                        $record->retire()->delete();
+
+                    }),
 
             ])
 
