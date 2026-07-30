@@ -84,6 +84,13 @@ class RetireRelationManager extends RelationManager
                     ->money('IDR')
                     ->sortable(),
 
+                TextColumn::make('KeteranganDetail')
+    ->label('Keterangan')
+    ->limit(50)
+    ->tooltip(fn ($record) => $record->KeteranganDetail)
+    ->wrap()
+    ->searchable(),
+
             ])
 
             ->headerActions([

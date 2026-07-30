@@ -84,6 +84,11 @@ class AssignmentRelationManager extends RelationManager
 
             ->columns([
 
+            TextColumn::make('license.IDLicense')
+    ->label('LICENSE ID')
+    ->sortable()
+    ->searchable(),
+
 
                 TextColumn::make('license.software.NamaSoftware')
                     ->label('SOFTWARE')
