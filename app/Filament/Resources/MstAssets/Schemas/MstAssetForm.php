@@ -216,6 +216,7 @@ class MstAssetForm
 
 
                         CurrencyInput::make('Harga')
+                        ->required()
                             ->label('Harga'),
 
 

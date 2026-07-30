@@ -75,6 +75,7 @@ class ServiceRelationManager extends RelationManager
                     ->columnSpanFull(),
 
                 CurrencyInput::make('Biaya')
+                ->required()
                             ->label('Biaya'),
 
                 Select::make('IDVendor')
@@ -120,12 +121,13 @@ class ServiceRelationManager extends RelationManager
                 TextColumn::make('vendor.NamaVendor')
                     ->label('Vendor'),
 
-                TextInput::make('harga')
-                    ->label('Harga')
-                    ->prefix('Rp')
-                    ->numeric()
-                    ->formatStateUsing(fn($state) => $state ? number_format($state, 0, ',', '.') : null)
-                    ->dehydrateStateUsing(fn($state) => str_replace('.', '', $state)),
+                TextColumn::make('Biaya')
+                    ->label('Biaya')
+                    ->money(
+                        'IDR',
+                        locale: 'id'
+                    )
+                    ->sortable(),
 
                 TextColumn::make('StatusService')
                     ->badge(),
