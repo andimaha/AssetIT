@@ -24,6 +24,7 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use App\Filament\Widgets\AssetStatusModalWidget;
+use App\Filament\Widgets\AssetCompanyModalWidget;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -87,6 +88,8 @@ class AdminPanelProvider extends PanelProvider
     AssetStatusModalWidget::class,
 
     AssetCompanyChart::class,
+
+    AssetCompanyModalWidget::class,
 
     WarrantyExpiringAssets::class,
 
