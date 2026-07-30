@@ -50,17 +50,18 @@ class MstAssetsTable
 
 
                 TextColumn::make('Nama')
-                    ->label('NAMA ASSET')
-                    ->searchable()
-                    ->sortable()
-                    ->wrap()
-                    ->extraAttributes([
-                        'style' => '
-                            max-width: 220px;
-                            white-space: normal;
-                            word-break: break-word;
-                        ',
-                    ]),
+    ->label('NAMA ASSET')
+    ->searchable()
+    ->sortable()
+    ->wrap()
+    ->extraAttributes([
+        'style' => '
+            max-width: 420px;
+            min-width: 350px;
+            white-space: normal;
+            word-break: break-word;
+        ',
+    ]),
 
 
 
