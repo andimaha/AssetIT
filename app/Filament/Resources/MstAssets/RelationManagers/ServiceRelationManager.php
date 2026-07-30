@@ -18,6 +18,7 @@ use Filament\Schemas\Schema;
 
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use App\Filament\Forms\Components\CurrencyInput;
 
 class ServiceRelationManager extends RelationManager
 {
@@ -73,10 +74,8 @@ class ServiceRelationManager extends RelationManager
                 Textarea::make('Tindakan')
                     ->columnSpanFull(),
 
-                TextInput::make('Biaya')
-                    ->numeric()
-                    ->prefix('Rp')
-                    ->default(0),
+                CurrencyInput::make('Biaya')
+                            ->label('Biaya'),
 
                 Select::make('IDVendor')
                     ->label('Vendor Service')
@@ -121,9 +120,12 @@ class ServiceRelationManager extends RelationManager
                 TextColumn::make('vendor.NamaVendor')
                     ->label('Vendor'),
 
-                TextColumn::make('Biaya')
-                    ->money('IDR')
-                    ->sortable(),
+                TextInput::make('harga')
+                    ->label('Harga')
+                    ->prefix('Rp')
+                    ->numeric()
+                    ->formatStateUsing(fn($state) => $state ? number_format($state, 0, ',', '.') : null)
+                    ->dehydrateStateUsing(fn($state) => str_replace('.', '', $state)),
 
                 TextColumn::make('StatusService')
                     ->badge(),

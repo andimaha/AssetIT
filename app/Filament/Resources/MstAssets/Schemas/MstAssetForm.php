@@ -14,6 +14,7 @@ use Carbon\Carbon;
 
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
+use App\Filament\Forms\Components\CurrencyInput;
 
 
 class MstAssetForm
@@ -132,7 +133,7 @@ class MstAssetForm
                         TextInput::make('Lapor')
 
                             ->label('Lapor'),
-                        
+
                         TextInput::make('Keterangan')
 
                             ->label('Keterangan'),
@@ -214,14 +215,8 @@ class MstAssetForm
 
 
 
-                        TextInput::make('Harga')
-
-                            ->label('Harga')
-
-                            ->numeric()
-
-                            ->prefix('Rp'),
-
+                        CurrencyInput::make('Harga')
+                            ->label('Harga'),
 
 
 
@@ -283,9 +278,9 @@ class MstAssetForm
 
                                         $garansi > 0
 
-                                            ? 'Ya'
+                                        ? 'Ya'
 
-                                            : 'Tidak'
+                                        : 'Tidak'
 
                                     );
 
@@ -398,7 +393,8 @@ class MstAssetForm
 
 
 
-                            ->visible(fn (Get $get) =>
+                            ->visible(
+                                fn(Get $get) =>
 
                                 $get('WarrantyStatus') === 'Ya'
 
@@ -477,7 +473,8 @@ class MstAssetForm
 
                             ->label('Tanggal Berakhir Garansi')
 
-                            ->visible(fn(Get $get) =>
+                            ->visible(
+                                fn(Get $get) =>
 
                                 $get('WarrantyStatus') === 'Ya'
 
