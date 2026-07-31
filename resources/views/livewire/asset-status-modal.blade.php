@@ -150,6 +150,10 @@
                         No Asset
                     </th>
 
+                    <th style="padding:12px;text-align:left">
+                        NoAssetSAP
+                    </th>
+
 
                     <th style="padding:12px;text-align:left">
                         Nama Asset
@@ -197,6 +201,11 @@
                     </td>
 
 
+    <td style="padding:12px">
+        {{ $asset->NoAssetSAP ?? '-' }}
+    </td>
+
+
                     <td style="padding:12px">
                         {{ $asset->Nama }}
                     </td>
@@ -226,7 +235,7 @@
                 <tr>
 
                     <td
-                        colspan="5"
+                        colspan="6"
                         style="
                             padding:30px;
                             text-align:center;

@@ -192,12 +192,12 @@ class AssetStatusChart extends ChartWidget
 
 
         Livewire.dispatch(
-            'open-asset-detail-modal',
-            {
-                status: status,
-                company: 'all',
-            }
-        );
+    'open-asset-detail-modal',
+    {
+        status: status,
+        company: $wire.filter,
+    }
+);
 
     }
 }
