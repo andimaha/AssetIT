@@ -101,7 +101,8 @@ class MstAssetsTable
 
                 TextColumn::make('RAM')
                     ->label('RAM')
-                    ->badge(),
+                    ->badge()
+                    ->toggleable(),
 
 
 

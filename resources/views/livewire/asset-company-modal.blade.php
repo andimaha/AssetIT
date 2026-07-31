@@ -143,43 +143,34 @@
             >
 
                 <thead>
+<tr style="background:#f3f4f6;">
 
+    <th style="padding:12px;text-align:left">
+        No Asset
+    </th>
 
-                <tr
-                    style="
-                        background:#f3f4f6;
-                    "
-                >
+    <th style="padding:12px;text-align:left">
+        No Asset SAP
+    </th>
 
-                    <th style="padding:12px;text-align:left">
-                        No Asset
-                    </th>
+    <th style="padding:12px;text-align:left">
+        Nama Asset
+    </th>
 
+    <th style="padding:12px;text-align:left">
+        Status
+    </th>
 
-                    <th style="padding:12px;text-align:left">
-                        Nama Asset
-                    </th>
+    <th style="padding:12px;text-align:left">
+        Pemegang
+    </th>
 
+    <th style="padding:12px;text-align:left">
+        Lokasi
+    </th>
 
-                    <th style="padding:12px;text-align:left">
-                        Status
-                    </th>
-
-
-                    <th style="padding:12px;text-align:left">
-                        Pemegang
-                    </th>
-
-
-                    <th style="padding:12px;text-align:left">
-                        Lokasi
-                    </th>
-
-
-                </tr>
-
-
-                </thead>
+</tr>
+</thead>
 
 
 
@@ -190,39 +181,33 @@
                 @forelse($this->assets as $asset)
 
 
-                <tr
-                    style="
-                        border-bottom:1px solid #e5e7eb;
-                    "
-                >
+                <tr style="border-bottom:1px solid #e5e7eb;">
 
+    <td style="padding:12px">
+        {{ $asset->NoAssetIT }}
+    </td>
 
-                    <td style="padding:12px">
-                        {{ $asset->NoAssetIT }}
-                    </td>
+    <td style="padding:12px">
+        {{ $asset->NoAssetSAP ?? '-' }}
+    </td>
 
+    <td style="padding:12px">
+        {{ $asset->Nama }}
+    </td>
 
-                    <td style="padding:12px">
-                        {{ $asset->Nama }}
-                    </td>
+    <td style="padding:12px">
+        {{ $asset->StatusAsset }}
+    </td>
 
+    <td style="padding:12px">
+        {{ $asset->karyawan?->Nama ?? '-' }}
+    </td>
 
-                    <td style="padding:12px">
-                        {{ $asset->StatusAsset }}
-                    </td>
+    <td style="padding:12px">
+        {{ $asset->lokasi?->NamaLokasi ?? '-' }}
+    </td>
 
-
-                    <td style="padding:12px">
-                        {{ $asset->karyawan?->Nama ?? '-' }}
-                    </td>
-
-
-                    <td style="padding:12px">
-                        {{ $asset->lokasi?->NamaLokasi ?? '-' }}
-                    </td>
-
-
-                </tr>
+</tr>
 
 
                 @empty
@@ -231,7 +216,7 @@
                 <tr>
 
                     <td
-                        colspan="5"
+                        colspan="6"
                         style="
                             padding:30px;
                             text-align:center;
