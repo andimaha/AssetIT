@@ -37,9 +37,11 @@ class AssignmentRelationManager extends RelationManager
                     ->required(),
 
                 DatePicker::make('TanggalAssign')
+                    ->format('Y-m-d') ->displayFormat('d M Y')
                     ->required(),
 
-                DatePicker::make('TanggalRevoke'),
+                DatePicker::make('TanggalRevoke')
+                    ->format('Y-m-d') ->displayFormat('d M Y'),
 
                 Select::make('StatusAssignment')
                     ->options([

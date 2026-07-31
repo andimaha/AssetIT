@@ -8,7 +8,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 
-use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 
@@ -62,9 +62,11 @@ class MutasiAssetRelationManager extends RelationManager
 
 
 
-                DateTimePicker::make('TanggalMutasi')
+                DatePicker::make('TanggalMutasi')
                     ->label('Tanggal Mutasi')
                     ->default(now())
+                    ->displayFormat('d M Y')
+                    ->format('Y-m-d') 
                     ->required(),
 
 

@@ -8,7 +8,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 
-use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
@@ -53,11 +53,13 @@ class ServiceRelationManager extends RelationManager
         return $schema
             ->components([
 
-                DateTimePicker::make('TanggalMasuk')
+                DatePicker::make('TanggalMasuk')
                     ->default(now())
+                    ->format('Y-m-d') ->displayFormat('d M Y')
                     ->required(),
 
-                DateTimePicker::make('TanggalSelesai'),
+                DatePicker::make('TanggalSelesai')
+                ->format('Y-m-d') ->displayFormat('d M Y'),
 
                 Select::make('JenisService')
                     ->options([

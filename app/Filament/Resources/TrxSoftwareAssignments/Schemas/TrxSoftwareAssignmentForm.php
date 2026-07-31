@@ -36,9 +36,11 @@ class TrxSoftwareAssignmentForm
                     ->required(),
 
                 DatePicker::make('TanggalAssign')
-                    ->required(),
+                    ->required()
+                    ->format('Y-m-d') ->displayFormat('d M Y'),
 
-                DatePicker::make('TanggalRevoke'),
+                DatePicker::make('TanggalRevoke')
+                    ->format('Y-m-d') ->displayFormat('d M Y'),
 
                 Select::make('StatusAssignment')
                     ->options([

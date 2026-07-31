@@ -173,6 +173,7 @@ class MstAssetForm
                         DatePicker::make('TanggalBeli')
 
                             ->label('Tanggal Beli')
+                    ->format('Y-m-d') ->displayFormat('d M Y')
 
                             ->default(now())
 

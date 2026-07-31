@@ -8,7 +8,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 
-use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
@@ -31,8 +31,9 @@ class RetireRelationManager extends RelationManager
                 TextInput::make('NoRetireSAP')
                     ->label('No Retire SAP'),
 
-                DateTimePicker::make('TanggalRetire')
+                DatePicker::make('TanggalRetire')
                     ->default(now())
+                    ->format('Y-m-d') ->displayFormat('d M Y')
                     ->required(),
 
                 Select::make('AlasanRetire')

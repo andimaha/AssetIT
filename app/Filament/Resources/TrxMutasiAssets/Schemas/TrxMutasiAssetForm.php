@@ -7,7 +7,7 @@ use Filament\Schemas\Schema;
 
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\DatePicker;
 
 
 
@@ -80,8 +80,9 @@ class TrxMutasiAssetForm
 
 
 
-            DateTimePicker::make('TanggalMutasi')
+            DatePicker::make('TanggalMutasi')
                 ->default(now())
+                    ->format('Y-m-d') ->displayFormat('d M Y')
                 ->required(),
 
 
