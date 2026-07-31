@@ -502,22 +502,14 @@ class MstAssetForm
 
 
                         Select::make('NIK')
-
-                            ->label('Pemegang Asset')
-
-                            ->relationship(
-
-                                'karyawan',
-
-                                'Nama'
-
-                            )
-
-                            ->searchable()
-
-                            ->preload()
-
-                            ->placeholder('Belum ada pemegang'),
+    ->label('Pemegang Asset')
+    ->relationship('karyawan', 'Nama')
+    ->getOptionLabelFromRecordUsing(
+        fn ($record) => $record->Nama . ' - ' . ($record->perusahaan?->NamaPerusahaan ?? '-')
+    )
+    ->searchable()
+    ->preload()
+    ->placeholder('Belum ada pemegang'),
 
 
 

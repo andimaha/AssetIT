@@ -34,14 +34,18 @@ class MutasiAssetRelationManager extends RelationManager
 
 
                 Select::make('NIK')
-                    ->label('Karyawan')
-                    ->relationship(
-                        'karyawan',
-                        'Nama'
-                    )
-                    ->searchable()
-                    ->preload()
-                    ->required(),
+    ->label('Karyawan')
+    ->relationship(
+        name: 'karyawan',
+        titleAttribute: 'Nama',
+        modifyQueryUsing: fn ($query) => $query->with('perusahaan')
+    )
+    ->getOptionLabelFromRecordUsing(
+        fn ($record) => $record->Nama . ' - ' . ($record->perusahaan?->NamaPerusahaan ?? '-')
+    )
+    ->searchable(['Nama'])
+    ->preload()
+    ->required(),
 
 
 
