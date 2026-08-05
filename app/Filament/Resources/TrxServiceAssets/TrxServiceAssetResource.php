@@ -8,33 +8,70 @@ use App\Filament\Resources\TrxServiceAssets\Pages\ListTrxServiceAssets;
 use App\Filament\Resources\TrxServiceAssets\Schemas\TrxServiceAssetForm;
 use App\Filament\Resources\TrxServiceAssets\Tables\TrxServiceAssetsTable;
 use App\Models\TrxServiceAsset;
-use BackedEnum;
+
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+
+use Filament\Support\Icons\Heroicon;
+
 
 class TrxServiceAssetResource extends Resource
 {
+
+
     protected static ?string $model = TrxServiceAsset::class;
 
-    protected static ?string $navigationLabel = 'Service';
 
-protected static ?string $modelLabel = 'Service';
 
-protected static ?string $pluralModelLabel = 'Service';
+    protected static bool $shouldRegisterNavigation = true;
 
-protected static string|\UnitEnum|null $navigationGroup = 'Transaksi';
+
+
+    protected static ?string $navigationLabel = 'Service Asset';
+
+
+
+    protected static ?string $modelLabel = 'Service Asset';
+
+
+
+    protected static ?string $pluralModelLabel = 'Service Asset';
+
+
+
+    protected static string|\UnitEnum|null $navigationGroup = 'Transaksi';
+
+
+
+    protected static ?int $navigationSort = 30;
+
+
+
+    protected static string|\BackedEnum|null $navigationIcon =
+        Heroicon::OutlinedWrenchScrewdriver;
+
+
+
+
 
     public static function form(Schema $schema): Schema
     {
         return TrxServiceAssetForm::configure($schema);
     }
 
+
+
+
+
     public static function table(Table $table): Table
     {
         return TrxServiceAssetsTable::configure($table);
     }
+
+
+
+
 
     public static function getRelations(): array
     {
@@ -43,12 +80,22 @@ protected static string|\UnitEnum|null $navigationGroup = 'Transaksi';
         ];
     }
 
+
+
+
+
     public static function getPages(): array
     {
         return [
+
             'index' => ListTrxServiceAssets::route('/'),
+
             'create' => CreateTrxServiceAsset::route('/create'),
+
             'edit' => EditTrxServiceAsset::route('/{record}/edit'),
+
         ];
     }
+
+
 }

@@ -2,11 +2,14 @@
 
 namespace App\Filament\Resources\TrxServiceAssets\Tables;
 
+
+use App\Filament\Exports\TrxServiceAssetExporter;
+
+use App\Models\MstAsset;
+
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ExportAction;
-
-use App\Filament\Exports\TrxServiceAssetExporter;
 
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -16,53 +19,137 @@ use Filament\Tables\Table;
 use Carbon\Carbon;
 
 
+
 class TrxServiceAssetsTable
 {
+
 
     public static function configure(Table $table): Table
     {
 
+
         return $table
+
+
+
+            ->modifyQueryUsing(function ($query) {
+
+
+                $query->with([
+
+                    'asset',
+
+                    'vendor',
+
+                ]);
+
+
+            })
+
+
+
 
             ->columns([
 
 
+
+
+
                 TextColumn::make('asset.NoAssetIT')
-                    ->label('Asset')
-                    ->searchable()
-                    ->sortable(),
+
+                    ->label('ASSET')
+
+                    ->formatStateUsing(function ($state, $record) {
+
+
+                        return
+
+                            ($record->asset?->NoAssetIT ?? '-')
+
+                            .
+
+                            ' | '
+
+                            .
+
+                            ($record->asset?->Nama ?? '-');
+
+
+                    })
+
+                    ->searchable([
+
+                        'asset.NoAssetIT',
+
+                        'asset.Nama',
+
+                    ])
+
+                    ->sortable()
+
+                    ->wrap(),
+
+
+
+
 
 
 
                 TextColumn::make('TanggalMasuk')
-                    ->label('Tanggal Masuk')
+
+                    ->label('TANGGAL MASUK')
+
                     ->date('d M Y')
+
                     ->sortable(),
+
+
+
+
+
 
 
 
                 TextColumn::make('TanggalSelesai')
-                    ->label('Tanggal Selesai')
+
+                    ->label('TANGGAL SELESAI')
+
                     ->date('d M Y')
+
+                    ->placeholder('-')
+
                     ->sortable(),
 
 
 
+
+
+
+
+
                 TextColumn::make('lama_perbaikan')
-                    ->label('Lama Perbaikan')
+
+                    ->label('LAMA PERBAIKAN')
+
                     ->state(function ($record) {
+
 
 
                         if (!$record->TanggalSelesai) {
 
+
                             return 'Belum Selesai';
 
+
                         }
+
 
 
                         $mulai = Carbon::parse(
                             $record->TanggalMasuk
                         )->startOfDay();
+
+
 
 
                         $selesai = Carbon::parse(
@@ -71,75 +158,175 @@ class TrxServiceAssetsTable
 
 
 
-                        $lama = $mulai->diffInDays($selesai);
+
+                        $lama = $mulai->diffInDays(
+                            $selesai
+                        );
 
 
 
-                        return number_format($lama,0)
-                            . ' Hari';
+                        return $lama . ' Hari';
 
 
                     })
+
                     ->badge(),
 
 
 
+
+
+
+
+
+
                 TextColumn::make('JenisService')
-                    ->label('Jenis Service')
+
+                    ->label('JENIS SERVICE')
+
                     ->searchable()
-                    ->sortable(),
+
+                    ->sortable()
+
+                    ->badge(),
+
+
+
+
+
+
 
 
 
                 TextColumn::make('Kerusakan')
-                    ->limit(40),
+
+                    ->label('KERUSAKAN')
+
+                    ->limit(50)
+
+                    ->wrap(),
+
+
+
+
+
+
 
 
 
                 TextColumn::make('Tindakan')
-                    ->limit(40),
+
+                    ->label('TINDAKAN')
+
+                    ->limit(50)
+
+                    ->wrap(),
+
+
+
+
+
+
 
 
 
                 TextColumn::make('vendor.NamaVendor')
-                    ->label('Vendor Service')
+
+                    ->label('VENDOR SERVICE')
+
+                    ->placeholder('-')
+
                     ->searchable()
+
                     ->sortable(),
+
+
+
+
+
+
 
 
 
                 TextColumn::make('Biaya')
-                    ->label('Biaya')
+
+                    ->label('BIAYA')
+
                     ->money(
                         'IDR',
                         locale:'id'
                     )
+
                     ->sortable(),
+
+
+
+
+
+
 
 
 
                 TextColumn::make('StatusService')
-                    ->label('Status')
+
+                    ->label('STATUS SERVICE')
+
                     ->badge()
-                    ->sortable(),
+
+                    ->sortable()
+
+                    ->color(fn (?string $state): string => match ($state) {
+
+
+                        'Proses' => 'warning',
+
+
+                        'Selesai' => 'success',
+
+
+                        'Unrepairable' => 'danger',
+
+
+                        default => 'gray',
+
+
+                    }),
+
+
+
+
+
+
 
 
 
                 TextColumn::make('Oleh')
-                    ->label('Teknisi IT')
+
+                    ->label('TEKNISI IT')
+
                     ->searchable(),
+
+
 
 
             ])
 
 
 
+
+
+
+
+
             ->filters([
+
+
+
 
 
                 SelectFilter::make('tahun')
 
-                    ->label('Tahun Service')
+                    ->label('TAHUN SERVICE')
 
                     ->options(function () {
 
@@ -182,9 +369,12 @@ class TrxServiceAssetsTable
 
 
 
+
+
+
                 SelectFilter::make('StatusService')
 
-                    ->label('Status Service')
+                    ->label('STATUS SERVICE')
 
                     ->options([
 
@@ -200,9 +390,11 @@ class TrxServiceAssetsTable
 
 
 
+
+
                 SelectFilter::make('JenisService')
 
-                    ->label('Jenis Service')
+                    ->label('JENIS SERVICE')
 
                     ->options([
 
@@ -216,11 +408,18 @@ class TrxServiceAssetsTable
 
 
 
+
             ])
 
 
 
+
+
+
+
+
             ->headerActions([
+
 
 
                 ExportAction::make()
@@ -232,7 +431,12 @@ class TrxServiceAssetsTable
                     ),
 
 
+
             ])
+
+
+
+
 
 
 
@@ -240,15 +444,108 @@ class TrxServiceAssetsTable
             ->actions([
 
 
+
                 EditAction::make(),
 
 
-                DeleteAction::make(),
+
+
+
+                DeleteAction::make()
+
+                    ->after(function ($record) {
+
+
+                        $asset = MstAsset::where(
+                            'NoAssetIT',
+                            $record->NoAssetIT
+                        )->first();
+
+
+
+                        if (!$asset) {
+
+                            return;
+
+                        }
+
+
+
+
+
+                        $services = $asset
+                            ->service()
+                            ->get();
+
+
+
+
+
+                        if (
+                            $services
+                                ->where(
+                                    'StatusService',
+                                    'Proses'
+                                )
+                                ->isNotEmpty()
+                        ) {
+
+
+                            $status = 'In Service';
+
+
+                        }
+
+
+
+                        elseif (
+
+                            $services
+                                ->where(
+                                    'StatusService',
+                                    'Unrepairable'
+                                )
+                                ->isNotEmpty()
+
+                        ) {
+
+
+                            $status = 'Retired';
+
+
+                        }
+
+
+
+                        else {
+
+
+                            $status = 'Available';
+
+
+                        }
+
+
+
+
+
+                        $asset->update([
+
+                            'StatusAsset'=>$status
+
+                        ]);
+
+
+
+                    }),
+
 
 
             ]);
 
 
+
     }
+
 
 }

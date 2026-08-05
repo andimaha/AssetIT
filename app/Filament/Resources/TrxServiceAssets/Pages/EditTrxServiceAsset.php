@@ -2,18 +2,97 @@
 
 namespace App\Filament\Resources\TrxServiceAssets\Pages;
 
+
 use App\Filament\Resources\TrxServiceAssets\TrxServiceAssetResource;
-use Filament\Actions\DeleteAction;
+use App\Models\MstAsset;
+
 use Filament\Resources\Pages\EditRecord;
+
+
 
 class EditTrxServiceAsset extends EditRecord
 {
+
     protected static string $resource = TrxServiceAssetResource::class;
 
-    protected function getHeaderActions(): array
+
+
+
+    protected function afterSave(): void
     {
-        return [
-            DeleteAction::make(),
-        ];
+        $this->updateAssetStatus();
     }
+
+
+
+
+
+    protected function updateAssetStatus(): void
+    {
+
+        $service = $this->record;
+
+
+
+        $asset = MstAsset::where(
+            'NoAssetIT',
+            $service->NoAssetIT
+        )->first();
+
+
+
+        if(!$asset){
+            return;
+        }
+
+
+
+
+        $services = $asset
+            ->service()
+            ->get();
+
+
+
+
+        if(
+            $services
+                ->where('StatusService','Proses')
+                ->isNotEmpty()
+        ){
+
+            $status='In Service';
+
+        }
+
+
+        elseif(
+            $services
+                ->where('StatusService','Unrepairable')
+                ->isNotEmpty()
+        ){
+
+            $status='Retired';
+
+        }
+
+
+        else{
+
+            $status='Available';
+
+        }
+
+
+
+
+        $asset->update([
+
+            'StatusAsset'=>$status
+
+        ]);
+
+    }
+
+
 }

@@ -10,12 +10,15 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Tables\Filters\SelectFilter;
+use App\Filament\Resources\MstSoftware\MstSoftwareResource;
 class MstSoftwareTable
 {
     public static function configure(Table $table): Table
     {
         return $table
-    ->recordUrl(null)
+    ->recordUrl(fn ($record) => MstSoftwareResource::getUrl('edit', [
+    'record' => $record,
+]))
     ->paginated([
         10,
         25,
