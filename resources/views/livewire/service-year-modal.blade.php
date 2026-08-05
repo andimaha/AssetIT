@@ -78,22 +78,25 @@ border-collapse:collapse;
 
 <tr style="background:#f3f4f6">
 
-<th>No Asset</th>
+    <th>No Asset</th>
 
-<th>Perusahaan</th>
+    <th>Nama Asset</th>
 
-<th>Tanggal Masuk</th>
+    <th>Perusahaan</th>
 
-<th>Jenis</th>
+    <th>Tanggal Masuk</th>
 
-<th>Status</th>
+    <th>Jenis</th>
 
-<th>Lama</th>
+    <th>Tindakan</th>
 
-<th>Biaya</th>
+    <th>Status</th>
+
+    <th>Lama</th>
+
+    <th>Biaya</th>
 
 </tr>
-
 
 </thead>
 
@@ -111,6 +114,9 @@ border-collapse:collapse;
 {{ $service->asset?->NoAssetIT }}
 </td>
 
+<td>
+    {{ $service->asset?->Nama }}
+</td>
 
 <td>
 {{ $service->asset?->perusahaan?->NamaPerusahaan }}
@@ -128,7 +134,9 @@ border-collapse:collapse;
 {{ $service->JenisService }}
 </td>
 
-
+<td>
+    {{ $service->Tindakan }}
+</td>
 
 <td>
 {{ $service->StatusService }}
