@@ -3,7 +3,6 @@
 namespace App\Filament\Forms\Components;
 
 use Filament\Forms\Components\TextInput;
-use Filament\Support\RawJs;
 
 class CurrencyInput extends TextInput
 {
@@ -13,61 +12,110 @@ class CurrencyInput extends TextInput
 
         $this
             ->prefix('Rp')
+
             ->numeric(false)
 
-            // Format saat nilai diambil dari database (Edit)
             ->formatStateUsing(function ($state) {
+
                 if (blank($state)) {
                     return null;
                 }
 
-                return number_format((float) $state, 2, ',', '.');
+                return number_format(
+                    (float) $state,
+                    2,
+                    ',',
+                    '.'
+                );
+
             })
 
-            // Format saat user mengetik
-            ->mask(RawJs::make(<<<'JS'
-                $input => {
-                    if (!$input) {
-                        return '';
-                    }
+            ->extraInputAttributes([
 
-                    // Sisakan hanya angka dan koma
-                    let value = $input
-                        .replace(/[^\d,]/g, '')
-                        .replace(/,+/g, ',');
+                'x-data' => '{}',
 
+                'x-on:input' => <<<'JS'
+
+                    let el = $event.target;
+
+                    let cursor = el.selectionStart;
+
+                    let value = el.value;
+
+                    // hapus titik ribuan lama
+                    value = value.replace(/\./g, '');
+
+                    // hanya izinkan angka dan koma
+                    value = value.replace(/[^0-9,]/g, '');
+
+                    // hanya satu koma desimal
                     let parts = value.split(',');
 
-                    // Hilangkan pemisah ribuan lama
-                    parts[0] = parts[0].replace(/\./g, '');
-
-                    // Format ribuan
-                    parts[0] = new Intl.NumberFormat('id-ID').format(parts[0]);
-
-                    // Maksimal 2 digit desimal
-                    if (parts.length > 1) {
-                        parts[1] = parts[1].substring(0, 2);
+                    if (parts.length > 2) {
+                        value = parts[0] + ',' + parts[1];
                     }
 
-                    return parts.length > 1
-                        ? parts[0] + ',' + parts[1]
-                        : parts[0];
-                }
-            JS))
 
-            // Format saat disimpan ke database
+                    let integer = parts[0];
+
+                    let decimal = parts[1] ?? null;
+
+
+                    if (!integer) {
+                        el.value = '';
+                        return;
+                    }
+
+
+                    // format ribuan
+                    integer = Number(integer).toLocaleString('id-ID');
+
+
+                    let formatted = integer;
+
+                    if (decimal !== null) {
+                        formatted += ',' + decimal;
+                    }
+
+
+                    el.value = formatted;
+
+
+                    let diff = formatted.length - value.length;
+
+                    el.setSelectionRange(
+                        cursor + diff,
+                        cursor + diff
+                    );
+
+
+                JS,
+
+            ])
+
+
             ->dehydrateStateUsing(function ($state) {
+
                 if (blank($state)) {
                     return null;
                 }
 
-                // Hilangkan pemisah ribuan
+
+                // hapus titik ribuan
                 $state = str_replace('.', '', $state);
 
-                // Ubah koma menjadi titik desimal
+
+                // ubah koma desimal menjadi titik
                 $state = str_replace(',', '.', $state);
 
-                return $state;
+
+                return number_format(
+                    (float) $state,
+                    2,
+                    '.',
+                    ''
+                );
+
             });
     }
 }
