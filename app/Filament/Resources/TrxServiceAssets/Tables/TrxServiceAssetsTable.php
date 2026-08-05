@@ -4,6 +4,9 @@ namespace App\Filament\Resources\TrxServiceAssets\Tables;
 
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ExportAction;
+
+use App\Filament\Exports\TrxServiceAssetExporter;
 
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -12,18 +15,23 @@ use Filament\Tables\Table;
 
 use Carbon\Carbon;
 
+
 class TrxServiceAssetsTable
 {
+
     public static function configure(Table $table): Table
     {
+
         return $table
 
             ->columns([
+
 
                 TextColumn::make('asset.NoAssetIT')
                     ->label('Asset')
                     ->searchable()
                     ->sortable(),
+
 
 
                 TextColumn::make('TanggalMasuk')
@@ -32,27 +40,48 @@ class TrxServiceAssetsTable
                     ->sortable(),
 
 
+
                 TextColumn::make('TanggalSelesai')
                     ->label('Tanggal Selesai')
                     ->date('d M Y')
                     ->sortable(),
 
 
+
                 TextColumn::make('lama_perbaikan')
                     ->label('Lama Perbaikan')
                     ->state(function ($record) {
 
+
                         if (!$record->TanggalSelesai) {
+
                             return 'Belum Selesai';
+
                         }
 
-                        $mulai = Carbon::parse($record->TanggalMasuk);
-                        $selesai = Carbon::parse($record->TanggalSelesai);
 
-                        return $mulai->diffInDays($selesai) . ' Hari';
+                        $mulai = Carbon::parse(
+                            $record->TanggalMasuk
+                        )->startOfDay();
+
+
+                        $selesai = Carbon::parse(
+                            $record->TanggalSelesai
+                        )->startOfDay();
+
+
+
+                        $lama = $mulai->diffInDays($selesai);
+
+
+
+                        return number_format($lama,0)
+                            . ' Hari';
+
 
                     })
                     ->badge(),
+
 
 
                 TextColumn::make('JenisService')
@@ -61,12 +90,15 @@ class TrxServiceAssetsTable
                     ->sortable(),
 
 
+
                 TextColumn::make('Kerusakan')
                     ->limit(40),
 
 
+
                 TextColumn::make('Tindakan')
                     ->limit(40),
+
 
 
                 TextColumn::make('vendor.NamaVendor')
@@ -75,10 +107,15 @@ class TrxServiceAssetsTable
                     ->sortable(),
 
 
+
                 TextColumn::make('Biaya')
                     ->label('Biaya')
-                    ->money('IDR', locale: 'id')
+                    ->money(
+                        'IDR',
+                        locale:'id'
+                    )
                     ->sortable(),
+
 
 
                 TextColumn::make('StatusService')
@@ -87,77 +124,131 @@ class TrxServiceAssetsTable
                     ->sortable(),
 
 
+
                 TextColumn::make('Oleh')
                     ->label('Teknisi IT')
                     ->searchable(),
 
+
             ])
+
 
 
             ->filters([
 
 
                 SelectFilter::make('tahun')
+
                     ->label('Tahun Service')
+
                     ->options(function () {
 
+
                         return \App\Models\TrxServiceAsset::query()
-                            ->selectRaw('YEAR(TanggalMasuk) as tahun')
+
+                            ->selectRaw(
+                                'YEAR(TanggalMasuk) as tahun'
+                            )
+
                             ->distinct()
+
                             ->orderByDesc('tahun')
-                            ->pluck('tahun', 'tahun');
+
+                            ->pluck(
+                                'tahun',
+                                'tahun'
+                            );
+
 
                     })
+
                     ->query(function ($query, array $data) {
 
+
                         if (!empty($data['value'])) {
+
 
                             $query->whereYear(
                                 'TanggalMasuk',
                                 $data['value']
                             );
 
+
                         }
+
 
                     }),
 
 
 
+
                 SelectFilter::make('StatusService')
+
                     ->label('Status Service')
+
                     ->options([
 
-                        'Proses' => 'Proses',
+                        'Proses'=>'Proses',
 
-                        'Selesai' => 'Selesai',
+                        'Selesai'=>'Selesai',
 
-                        'Unrepairable' => 'Unrepairable',
+                        'Unrepairable'=>'Unrepairable',
 
                     ]),
+
+
+
 
 
                 SelectFilter::make('JenisService')
+
                     ->label('Jenis Service')
+
                     ->options([
 
-                        'Maintenance' => 'Maintenance',
+                        'Maintenance'=>'Maintenance',
 
-                        'Perbaikan' => 'Perbaikan',
+                        'Perbaikan'=>'Perbaikan',
 
-                        'Upgrade' => 'Upgrade',
+                        'Upgrade'=>'Upgrade',
 
                     ]),
+
 
 
             ])
 
 
+
+            ->headerActions([
+
+
+                ExportAction::make()
+
+                    ->label('Export Excel')
+
+                    ->exporter(
+                        TrxServiceAssetExporter::class
+                    ),
+
+
+            ])
+
+
+
+
             ->actions([
+
 
                 EditAction::make(),
 
+
                 DeleteAction::make(),
 
+
             ]);
+
+
     }
+
 }

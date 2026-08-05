@@ -6,6 +6,10 @@ use App\Filament\Widgets\AssetCompanyChart;
 use App\Filament\Widgets\AssetStats;
 use App\Filament\Widgets\AssetStatusChart;
 use App\Filament\Widgets\WarrantyExpiringAssets;
+use App\Filament\Widgets\AssetStatusModalWidget;
+use App\Filament\Widgets\AssetCompanyModalWidget;
+use App\Filament\Widgets\ServiceYearChart;
+use App\Filament\Widgets\ServiceYearModalWidget;
 
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -23,8 +27,7 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
-use App\Filament\Widgets\AssetStatusModalWidget;
-use App\Filament\Widgets\AssetCompanyModalWidget;
+
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -40,6 +43,9 @@ class AdminPanelProvider extends PanelProvider
 
 
             ->login()
+
+
+            ->databaseNotifications()
 
 
             ->colors([
@@ -79,21 +85,27 @@ class AdminPanelProvider extends PanelProvider
 
 
 
+
             ->widgets([
 
-    AssetStats::class,
+                AssetStats::class,
 
-    AssetStatusChart::class,
+                AssetStatusChart::class,
 
-    AssetStatusModalWidget::class,
+                AssetStatusModalWidget::class,
 
-    AssetCompanyChart::class,
+                AssetCompanyChart::class,
 
-    AssetCompanyModalWidget::class,
+                AssetCompanyModalWidget::class,
 
-    WarrantyExpiringAssets::class,
+                ServiceYearChart::class,
 
-])
+                ServiceYearModalWidget::class,
+
+                WarrantyExpiringAssets::class,
+
+            ])
+
 
 
 
@@ -119,6 +131,7 @@ class AdminPanelProvider extends PanelProvider
                 DispatchServingFilamentEvent::class,
 
             ])
+
 
 
 
