@@ -91,6 +91,18 @@ class TrxServiceAssetsTable
 
 
 
+                TextColumn::make('asset.karyawan.Nama')
+                    ->label('NAMA')
+                    ->placeholder('-')
+                    ->searchable()
+                    ->sortable(),
+
+                TextColumn::make('asset.perusahaan.NamaPerusahaan')
+                    ->label('PERUSAHAAN')
+                    ->placeholder('-')
+                    ->searchable()
+                    ->sortable(),
+
 
 
 
@@ -254,7 +266,7 @@ class TrxServiceAssetsTable
 
                     ->money(
                         'IDR',
-                        locale:'id'
+                        locale: 'id'
                     )
 
                     ->sortable(),
@@ -275,7 +287,7 @@ class TrxServiceAssetsTable
 
                     ->sortable()
 
-                    ->color(fn (?string $state): string => match ($state) {
+                    ->color(fn(?string $state): string => match ($state) {
 
 
                         'Proses' => 'warning',
@@ -378,11 +390,11 @@ class TrxServiceAssetsTable
 
                     ->options([
 
-                        'Proses'=>'Proses',
+                        'Proses' => 'Proses',
 
-                        'Selesai'=>'Selesai',
+                        'Selesai' => 'Selesai',
 
-                        'Unrepairable'=>'Unrepairable',
+                        'Unrepairable' => 'Unrepairable',
 
                     ]),
 
@@ -398,11 +410,11 @@ class TrxServiceAssetsTable
 
                     ->options([
 
-                        'Maintenance'=>'Maintenance',
+                        'Maintenance' => 'Maintenance',
 
-                        'Perbaikan'=>'Perbaikan',
+                        'Perbaikan' => 'Perbaikan',
 
-                        'Upgrade'=>'Upgrade',
+                        'Upgrade' => 'Upgrade',
 
                     ]),
 
@@ -494,11 +506,7 @@ class TrxServiceAssetsTable
                             $status = 'In Service';
 
 
-                        }
-
-
-
-                        elseif (
+                        } elseif (
 
                             $services
                                 ->where(
@@ -513,11 +521,7 @@ class TrxServiceAssetsTable
                             $status = 'Retired';
 
 
-                        }
-
-
-
-                        else {
+                        } else {
 
 
                             $status = 'Available';
@@ -531,7 +535,7 @@ class TrxServiceAssetsTable
 
                         $asset->update([
 
-                            'StatusAsset'=>$status
+                            'StatusAsset' => $status
 
                         ]);
 
