@@ -34,15 +34,12 @@ class TrxServiceAssetsTable
 
             ->modifyQueryUsing(function ($query) {
 
-
                 $query->with([
-
                     'asset',
-
                     'vendor',
-
-                ]);
-
+                ])
+                    ->orderByDesc('TanggalMasuk')
+                    ->orderByDesc('IDService');
 
             })
 
