@@ -10,6 +10,8 @@ use App\Filament\Widgets\AssetStatusModalWidget;
 use App\Filament\Widgets\AssetCompanyModalWidget;
 use App\Filament\Widgets\ServiceYearChart;
 use App\Filament\Widgets\ServiceYearModalWidget;
+use App\Filament\Widgets\AssetJenisCompanyChart;
+use App\Filament\Widgets\AssetJenisCompanyModalWidget;
 
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -27,6 +29,7 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+
 
 
 class AdminPanelProvider extends PanelProvider
@@ -97,6 +100,10 @@ class AdminPanelProvider extends PanelProvider
                 AssetCompanyChart::class,
 
                 AssetCompanyModalWidget::class,
+
+                AssetJenisCompanyChart::class,
+
+                AssetJenisCompanyModalWidget::class,
 
                 ServiceYearChart::class,
 
