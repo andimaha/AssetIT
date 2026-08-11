@@ -63,8 +63,9 @@
                                 font-weight:700;
                             "
                         >
-                            Detail Asset
+                            Detail Asset Berdasarkan Lokasi
                         </div>
+
 
                         <div
                             style="
@@ -73,14 +74,16 @@
                             "
                         >
 
-                            Status :
-                            <b>{{ $status }}</b>
-
-                            &nbsp; | &nbsp;
-
                             Lokasi :
                             <b>
                                 {{ $this->locationName }}
+                            </b>
+
+                            &nbsp; | &nbsp;
+
+                            Status :
+                            <b>
+                                {{ $this->statusName }}
                             </b>
 
                             &nbsp; | &nbsp;
@@ -150,6 +153,7 @@
                                     No Asset
                                 </th>
 
+
                                 <th
                                     style="
                                         padding:12px;
@@ -158,6 +162,7 @@
                                 >
                                     No Asset SAP
                                 </th>
+
 
                                 <th
                                     style="
@@ -168,6 +173,7 @@
                                     Nama Asset
                                 </th>
 
+
                                 <th
                                     style="
                                         padding:12px;
@@ -176,6 +182,7 @@
                                 >
                                     Status
                                 </th>
+
 
                                 <th
                                     style="
@@ -186,6 +193,7 @@
                                     Perusahaan
                                 </th>
 
+
                                 <th
                                     style="
                                         padding:12px;
@@ -194,6 +202,7 @@
                                 >
                                     Pemegang
                                 </th>
+
 
                                 <th
                                     style="
@@ -219,30 +228,39 @@
                                     "
                                 >
 
+                                    {{-- NO ASSET --}}
                                     <td
                                         style="padding:12px"
                                     >
                                         {{ $asset->NoAssetIT }}
                                     </td>
 
+
+                                    {{-- NO ASSET SAP --}}
                                     <td
                                         style="padding:12px"
                                     >
                                         {{ $asset->NoAssetSAP ?? '-' }}
                                     </td>
 
+
+                                    {{-- NAMA ASSET --}}
                                     <td
                                         style="padding:12px"
                                     >
                                         {{ $asset->Nama ?? '-' }}
                                     </td>
 
+
+                                    {{-- STATUS --}}
                                     <td
                                         style="padding:12px"
                                     >
                                         {{ $asset->StatusAsset ?? '-' }}
                                     </td>
 
+
+                                    {{-- PERUSAHAAN --}}
                                     <td
                                         style="padding:12px"
                                     >
@@ -252,6 +270,8 @@
                                         }}
                                     </td>
 
+
+                                    {{-- PEMEGANG --}}
                                     <td
                                         style="padding:12px"
                                     >
@@ -261,6 +281,8 @@
                                         }}
                                     </td>
 
+
+                                    {{-- LOKASI --}}
                                     <td
                                         style="padding:12px"
                                     >

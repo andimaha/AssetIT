@@ -11,31 +11,46 @@ class AssetLocationStatusModal extends Component
 {
     public bool $show = false;
 
-    public ?string $status = null;
+    /**
+     * Lokasi yang dipilih dari chart
+     */
+    public ?string $location = null;
 
-    public ?string $location = 'all';
+    /**
+     * Status yang sedang difilter
+     */
+    public ?string $status = 'all';
 
+    /**
+     * Buka modal
+     */
     #[On('open-location-status-detail-modal')]
     public function open(
-        $status,
-        $location = 'all'
+        $location,
+        $status = 'all'
     ) {
-        $this->status = $status;
-
         $this->location = $location;
+
+        $this->status = $status;
 
         $this->show = true;
     }
 
+    /**
+     * Tutup modal
+     */
     public function close()
     {
         $this->show = false;
 
-        $this->status = null;
+        $this->location = null;
 
-        $this->location = 'all';
+        $this->status = 'all';
     }
 
+    /**
+     * Nama lokasi
+     */
     public function getLocationNameProperty(): string
     {
         if (
@@ -53,24 +68,32 @@ class AssetLocationStatusModal extends Component
             ->value('NamaLokasi') ?? '-';
     }
 
+    /**
+     * Nama status
+     */
+    public function getStatusNameProperty(): string
+    {
+        if (
+            $this->status === null ||
+            $this->status === 'all'
+        ) {
+            return 'Semua Status';
+        }
+
+        return $this->status;
+    }
+
+    /**
+     * Asset berdasarkan:
+     *
+     * 1. Lokasi yang diklik
+     * 2. Status yang sedang dipilih
+     */
     public function getAssetsProperty()
     {
         return MstAsset::query()
 
-            /*
-             * FILTER STATUS
-             */
-            ->when(
-                $this->status !== null &&
-                $this->status !== 'all',
-                fn ($query) =>
-                    $query->where(
-                        'StatusAsset',
-                        $this->status
-                    )
-            )
-
-            /*
+            /**
              * FILTER LOKASI
              */
             ->when(
@@ -83,7 +106,20 @@ class AssetLocationStatusModal extends Component
                     )
             )
 
-            /*
+            /**
+             * FILTER STATUS
+             */
+            ->when(
+                $this->status !== null &&
+                $this->status !== 'all',
+                fn ($query) =>
+                    $query->where(
+                        'StatusAsset',
+                        $this->status
+                    )
+            )
+
+            /**
              * RELATIONSHIP
              */
             ->with([
@@ -92,6 +128,9 @@ class AssetLocationStatusModal extends Component
                 'lokasi',
             ])
 
+            /**
+             * SORT ASSET
+             */
             ->orderBy(
                 'NoAssetIT'
             )
@@ -99,6 +138,9 @@ class AssetLocationStatusModal extends Component
             ->get();
     }
 
+    /**
+     * Render
+     */
     public function render()
     {
         return view(
