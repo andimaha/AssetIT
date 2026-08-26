@@ -11,6 +11,9 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Tables\Filters\SelectFilter;
 use App\Filament\Resources\MstSoftware\MstSoftwareResource;
+use App\Filament\Exports\MstSoftwareExporter;
+use Filament\Actions\ExportAction;
+
 class MstSoftwareTable
 {
     public static function configure(Table $table): Table
@@ -180,6 +183,11 @@ class MstSoftwareTable
                 DeleteAction::make(),
             ])
             ->toolbarActions([
+
+            ExportAction::make()
+        ->label('Export Excel')
+        ->exporter(MstSoftwareExporter::class),
+        
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),

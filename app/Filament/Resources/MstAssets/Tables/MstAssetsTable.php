@@ -8,6 +8,9 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use App\Filament\Exports\MstAssetExporter;
+use Filament\Actions\ExportAction;
+
 
 
 class MstAssetsTable
@@ -321,7 +324,11 @@ class MstAssetsTable
             ->toolbarActions([
 
 
-                BulkActionGroup::make([
+            ExportAction::make()
+        ->label('Export Excel')
+        ->exporter(MstAssetExporter::class),
+            
+            BulkActionGroup::make([
 
                     DeleteBulkAction::make(),
 
