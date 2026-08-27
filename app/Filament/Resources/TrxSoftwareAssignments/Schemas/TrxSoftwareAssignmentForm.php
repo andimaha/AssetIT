@@ -2,28 +2,17 @@
 
 namespace App\Filament\Resources\TrxSoftwareAssignments\Schemas;
 
-
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
-
 use Filament\Schemas\Schema;
-
-
 
 class TrxSoftwareAssignmentForm
 {
-
-
     public static function configure(Schema $schema): Schema
     {
-
-
         return $schema
 
             ->components([
-
-
-
 
                 Select::make('NoAssetIT')
 
@@ -34,79 +23,65 @@ class TrxSoftwareAssignmentForm
                         'NoAssetIT'
                     )
 
-
                     ->getOptionLabelFromRecordUsing(
                         function ($record) {
 
                             return
 
                                 ($record->NoAssetIT ?? '-')
-                                .
-                                ' | '
-                                .
-                                ($record->Nama ?? '-');
+                                . ' | '
+                                . ($record->NoAssetSAP ?? '-')
+                                . ' | '
+                                . ($record->Nama ?? '-')
+                                . ' | '
+                                . ($record->perusahaan?->NamaPerusahaan ?? '-');
 
                         }
                     )
-
 
                     ->searchable([
 
                         'NoAssetIT',
 
+                        'NoAssetSAP',
+
                         'Nama',
 
                     ])
 
-
                     ->preload()
 
-
                     ->required(),
-
-
-
-
-
 
 
                 Select::make('IDLicense')
 
                     ->label('Software License')
 
-
                     ->relationship(
                         'license',
                         'IDLicense'
                     )
 
-
                     ->getOptionLabelFromRecordUsing(
                         function ($record) {
-
 
                             $software =
                                 $record->software?->NamaSoftware
                                 ??
                                 '-';
 
-
                             $key =
                                 $record->ProductKey
                                 ?:
                                 '-';
 
-
-
                             return
 
                                 "{$software} | {$record->IDLicense} | {$key}";
 
-
                         }
                     )
-
-
 
                     ->searchable([
 
@@ -118,18 +93,9 @@ class TrxSoftwareAssignmentForm
 
                     ])
 
-
-
                     ->preload()
 
-
-
                     ->required(),
-
-
-
-
-
 
 
                 DatePicker::make('TanggalAssign')
@@ -145,11 +111,6 @@ class TrxSoftwareAssignmentForm
                     ->displayFormat('d M Y'),
 
 
-
-
-
-
-
                 DatePicker::make('TanggalRevoke')
 
                     ->label('Tanggal Revoke')
@@ -159,16 +120,9 @@ class TrxSoftwareAssignmentForm
                     ->displayFormat('d M Y'),
 
 
-
-
-
-
-
                 Select::make('StatusAssignment')
 
-
                     ->label('Status Assignment')
-
 
                     ->options([
 
@@ -180,18 +134,10 @@ class TrxSoftwareAssignmentForm
 
                     ])
 
-
                     ->default('Installed')
-
 
                     ->required(),
 
-
-
-
             ]);
-
     }
-
-
 }
