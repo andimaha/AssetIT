@@ -14,6 +14,9 @@ use App\Filament\Widgets\AssetJenisCompanyChart;
 use App\Filament\Widgets\AssetJenisCompanyModalWidget;
 use App\Filament\Widgets\AssetLocationStatusModalWidget;
 use App\Filament\Widgets\AssetLocationStatusChart;
+use App\Filament\Widgets\AssetDepartmentChart;
+use App\Filament\Widgets\AssetDepartmentModalWidget;
+
 
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -99,6 +102,9 @@ class AdminPanelProvider extends PanelProvider
                 AssetStatusChart::class,
 
                 AssetStatusModalWidget::class,
+
+                AssetDepartmentChart::class,
+                AssetDepartmentModalWidget::class,
 
                 AssetCompanyChart::class,
 
