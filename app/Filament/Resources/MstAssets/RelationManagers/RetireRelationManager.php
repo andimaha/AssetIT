@@ -19,37 +19,60 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
+
 class RetireRelationManager extends RelationManager
 {
     protected static string $relationship = 'retire';
+
 
     public function form(Schema $schema): Schema
     {
         return $schema
             ->components([
 
+
                 TextInput::make('NoRetireSAP')
                     ->label('No Retire SAP'),
 
+
                 DatePicker::make('TanggalRetire')
+                    ->label('Tanggal Retire')
                     ->default(now())
-                    ->format('Y-m-d') ->displayFormat('d M Y')
+                    ->format('Y-m-d')
+                    ->displayFormat('d M Y')
                     ->required(),
 
+
                 Select::make('AlasanRetire')
+                    ->label('Alasan Retire')
                     ->options([
                         'Rusak Total' => 'Rusak Total',
+                        'Rusak Partial' => 'Rusak Partial',
                         'Hilang' => 'Hilang',
-                        'Dijual' => 'Dijual',
-                        'Hibah' => 'Hibah',
+                        'Others' => 'Others',
                     ])
                     ->required(),
 
+
+                Select::make('Kondisi')
+                    ->label('Kondisi')
+                    ->options([
+                        'Di jual' => 'Di jual',
+                        'Di simpan' => 'Di simpan',
+                        'Di hibahkan' => 'Di hibahkan',
+                        'Others' => 'Others',
+                    ])
+                    ->required(),
+
+
                 Textarea::make('KeteranganDetail')
+                    ->label('Keterangan Detail')
                     ->columnSpanFull(),
+
 
                 TextInput::make('EksekutorIT')
                     ->label('Eksekutor IT'),
+
 
                 TextInput::make('NilaiSisa')
                     ->label('Nilai Sisa')
@@ -60,39 +83,65 @@ class RetireRelationManager extends RelationManager
             ]);
     }
 
+
     public function table(Table $table): Table
     {
         return $table
+
             ->recordTitleAttribute('AlasanRetire')
 
+            ->defaultSort(
+                'TanggalRetire',
+                'desc'
+            )
+
             ->columns([
+
 
                 TextColumn::make('NoRetireSAP')
                     ->label('No Retire SAP')
                     ->searchable(),
 
+
                 TextColumn::make('TanggalRetire')
+                    ->label('Tanggal Retire')
                     ->date('d M Y')
                     ->sortable(),
 
+
                 TextColumn::make('AlasanRetire')
-                    ->badge(),
+                    ->label('Alasan Retire')
+                    ->badge()
+                    ->searchable(),
+
+
+                TextColumn::make('Kondisi')
+                    ->label('Kondisi')
+                    ->badge()
+                    ->searchable(),
+
 
                 TextColumn::make('EksekutorIT')
                     ->label('Eksekutor IT'),
 
+
                 TextColumn::make('NilaiSisa')
+                    ->label('Nilai Sisa')
                     ->money('IDR')
                     ->sortable(),
 
+
                 TextColumn::make('KeteranganDetail')
-    ->label('Keterangan')
-    ->limit(50)
-    ->tooltip(fn ($record) => $record->KeteranganDetail)
-    ->wrap()
-    ->searchable(),
+                    ->label('Keterangan')
+                    ->limit(50)
+                    ->tooltip(
+                        fn ($record) => $record->KeteranganDetail
+                    )
+                    ->wrap()
+                    ->searchable(),
 
             ])
+
 
             ->headerActions([
 
@@ -103,11 +152,14 @@ class RetireRelationManager extends RelationManager
                             'StatusAsset' => 'Retired',
                         ]);
 
-                        $livewire->dispatch('refreshAssetForm');
+                        $livewire->dispatch(
+                            'refreshAssetForm'
+                        );
 
                     }),
 
             ])
+
 
             ->recordActions([
 
@@ -117,13 +169,17 @@ class RetireRelationManager extends RelationManager
                         $livewire->getOwnerRecord()->update([
                             'StatusAsset' => 'Retired',
                         ]);
-                        $livewire->dispatch('refreshAssetForm');
+
+                        $livewire->dispatch(
+                            'refreshAssetForm'
+                        );
 
                     }),
 
                 DeleteAction::make(),
 
             ])
+
 
             ->toolbarActions([
 

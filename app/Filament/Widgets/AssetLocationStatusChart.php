@@ -173,12 +173,12 @@ class AssetLocationStatusChart extends ChartWidget
 
     protected function getType(): string
     {
-        return 'bar';
+        return 'pie';
     }
 
     protected function getOptions(): RawJs
-    {
-        return RawJs::make(<<<'JS'
+{
+    return RawJs::make(<<<'JS'
 
 {
     responsive: true,
@@ -188,41 +188,27 @@ class AssetLocationStatusChart extends ChartWidget
     plugins: {
         legend: {
             display: true,
+
+            position: 'right',
         },
 
         tooltip: {
             callbacks: {
+
                 label: function(context) {
-                    return 'Jumlah Asset: ' + context.parsed.y;
+
+                    const label =
+                        context.label || '';
+
+                    const value =
+                        context.raw || 0;
+
+                    return label +
+                        ': ' +
+                        value +
+                        ' Asset';
                 }
-            }
-        }
-    },
 
-    scales: {
-        x: {
-            title: {
-                display: true,
-                text: 'Lokasi'
-            },
-
-            ticks: {
-                autoSkip: false,
-                maxRotation: 45,
-                minRotation: 0
-            }
-        },
-
-        y: {
-            beginAtZero: true,
-
-            title: {
-                display: true,
-                text: 'Jumlah Asset'
-            },
-
-            ticks: {
-                precision: 0
             }
         }
     },
@@ -233,7 +219,8 @@ class AssetLocationStatusChart extends ChartWidget
             return;
         }
 
-        const index = elements[0].index;
+        const index =
+            elements[0].index;
 
         const locationId =
             chart.data.locationIds[index];
@@ -262,5 +249,6 @@ class AssetLocationStatusChart extends ChartWidget
 }
 
 JS);
-    }
+}
+
 }

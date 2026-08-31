@@ -28,13 +28,13 @@ class TrxSoftwareAssignmentsTable
 
 
             ->recordUrl(
-                fn ($record) =>
-                    TrxSoftwareAssignmentResource::getUrl(
-                        'edit',
-                        [
-                            'record' => $record,
-                        ]
-                    )
+                fn($record) =>
+                TrxSoftwareAssignmentResource::getUrl(
+                    'edit',
+                    [
+                        'record' => $record,
+                    ]
+                )
             )
 
 
@@ -206,38 +206,27 @@ class TrxSoftwareAssignmentsTable
 
                     ->label('SOFTWARE')
 
-                    ->formatStateUsing(function ($state, $record) {
+                    ->placeholder('-')
 
-
-                        return
-
-                            ($record->license?->software?->NamaSoftware ?? '-')
-
-                            .
-
-                            ' | License: '
-
-                            .
-
-                            ($record->license?->IDLicense ?? '-');
-
-
-                    })
-
-
-                    ->searchable([
-
-                        'license.IDLicense',
-
-                        'license.ProductKey',
-
-                        'license.software.NamaSoftware',
-
-                    ])
+                    ->searchable()
 
                     ->sortable()
 
                     ->wrap(),
+
+
+                TextColumn::make('license.IDLicense')
+
+                    ->label('ID LICENSE')
+
+                    ->placeholder('-')
+
+                    ->searchable()
+
+                    ->sortable()
+
+                    ->wrap(),
+
 
 
 
@@ -293,13 +282,13 @@ class TrxSoftwareAssignmentsTable
                     ->label('PRODUCT KEY')
 
                     ->formatStateUsing(
-                        fn () => '••••••••••••••'
+                        fn() => '••••••••••••••'
                     )
 
                     ->copyable(false)
 
                     ->toggleable(
-                        isToggledHiddenByDefault:true
+                        isToggledHiddenByDefault: true
                     ),
 
 
@@ -350,7 +339,7 @@ class TrxSoftwareAssignmentsTable
 
                     ->badge()
 
-                    ->color(fn (?string $state): string => match ($state) {
+                    ->color(fn(?string $state): string => match ($state) {
 
 
                         'Available' => 'success',
@@ -384,7 +373,7 @@ class TrxSoftwareAssignmentsTable
 
                     ->sortable()
 
-                    ->color(fn (?string $state): string => match ($state) {
+                    ->color(fn(?string $state): string => match ($state) {
 
 
                         'Installed' => 'success',
@@ -428,7 +417,7 @@ class TrxSoftwareAssignmentsTable
                     ->slideOver()
 
                     ->modalHeading(
-                        fn ($record) =>
+                        fn($record) =>
                         'Product Key - ' .
                         (
                             $record->license?->software?->NamaSoftware
@@ -441,7 +430,8 @@ class TrxSoftwareAssignmentsTable
 
                     ->modalCancelActionLabel('Close')
 
-                    ->modalContent(fn ($record) =>
+                    ->modalContent(
+                        fn($record) =>
                         view(
                             'filament.tables.columns.assignment-product-key',
                             [

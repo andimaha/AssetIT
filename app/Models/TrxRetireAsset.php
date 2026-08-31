@@ -23,6 +23,7 @@ class TrxRetireAsset extends Model
     'NoRetireSAP',
     'TanggalRetire',
     'AlasanRetire',
+    'Kondisi',
     'KeteranganDetail',
     'EksekutorIT',
     'NilaiSisa'

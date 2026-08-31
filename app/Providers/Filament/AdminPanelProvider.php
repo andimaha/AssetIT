@@ -16,6 +16,8 @@ use App\Filament\Widgets\AssetLocationStatusModalWidget;
 use App\Filament\Widgets\AssetLocationStatusChart;
 use App\Filament\Widgets\AssetDepartmentChart;
 use App\Filament\Widgets\AssetDepartmentModalWidget;
+use App\Filament\Widgets\SoftwareAssignmentCompanyChart;
+use App\Filament\Widgets\SoftwareAssignmentCompanyModalWidget;
 
 
 use Filament\Http\Middleware\Authenticate;
@@ -102,13 +104,14 @@ class AdminPanelProvider extends PanelProvider
                 AssetStatusChart::class,
 
                 AssetStatusModalWidget::class,
+                AssetCompanyChart::class,
+
+                AssetCompanyModalWidget::class,
 
                 AssetDepartmentChart::class,
                 AssetDepartmentModalWidget::class,
 
-                AssetCompanyChart::class,
-
-                AssetCompanyModalWidget::class,
+                
 
                 AssetJenisCompanyChart::class,
 
@@ -121,6 +124,9 @@ class AdminPanelProvider extends PanelProvider
                 ServiceYearChart::class,
 
                 ServiceYearModalWidget::class,
+                SoftwareAssignmentCompanyChart::class,
+
+                SoftwareAssignmentCompanyModalWidget::class,
 
                 WarrantyExpiringAssets::class,
 
