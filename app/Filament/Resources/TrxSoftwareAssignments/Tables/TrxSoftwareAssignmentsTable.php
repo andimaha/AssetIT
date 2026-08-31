@@ -129,13 +129,31 @@ class TrxSoftwareAssignmentsTable
 
                     })
 
-                    ->searchable([
+                    ->searchable(
+                        query: function ($query, string $search): void {
 
-                        'asset.NoAssetIT',
+                            $query->whereHas('asset', function ($query) use ($search) {
 
-                        'asset.Nama',
+                                $query->where(function ($query) use ($search) {
 
-                    ])
+                                    $query->where(
+                                        'NoAssetIT',
+                                        'like',
+                                        "%{$search}%"
+                                    )
+
+                                    ->orWhere(
+                                        'Nama',
+                                        'like',
+                                        "%{$search}%"
+                                    );
+
+                                });
+
+                            });
+
+                        }
+                    )
 
                     ->sortable()
 
