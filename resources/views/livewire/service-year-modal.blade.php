@@ -1,421 +1,441 @@
 <div>
+@if ($show)
 
-    @if ($show)
+    <div
+        style="
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        "
+    >
 
+        {{-- BACKDROP --}}
+        <div
+            wire:click="close"
+            style="
+                position: absolute;
+                inset: 0;
+                background: rgba(0, 0, 0, .55);
+                backdrop-filter: blur(4px);
+            "
+        ></div>
+
+
+        {{-- MODAL BOX --}}
         <div
             style="
-                position: fixed;
-                inset: 0;
-                z-index: 9999;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                padding: 20px;
+                position: relative;
+                width: 90%;
+                max-width: 1200px;
+                max-height: 85vh;
+                background: white;
+                border-radius: 18px;
+                overflow: hidden;
+                box-shadow: 0 25px 50px rgba(0, 0, 0, .25);
             "
         >
 
-            {{-- BACKDROP --}}
-            <div
-                wire:click="close"
-                style="
-                    position: absolute;
-                    inset: 0;
-                    background: rgba(0, 0, 0, .55);
-                    backdrop-filter: blur(4px);
-                "
-            ></div>
-
-
-            {{-- MODAL BOX --}}
+            {{-- HEADER --}}
             <div
                 style="
-                    position: relative;
-                    width: 90%;
-                    max-width: 1200px;
-                    max-height: 85vh;
-                    background: white;
-                    border-radius: 18px;
-                    overflow: hidden;
-                    box-shadow: 0 25px 50px rgba(0, 0, 0, .25);
+                    background: linear-gradient(
+                        135deg,
+                        #f97316,
+                        #ea580c
+                    );
+                    color: white;
+                    padding: 20px 25px;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
                 "
             >
 
-                {{-- HEADER --}}
-                <div
-                    style="
-                        background: linear-gradient(
-                            135deg,
-                            #f97316,
-                            #ea580c
-                        );
-                        color: white;
-                        padding: 20px 25px;
-                        display: flex;
-                        justify-content: space-between;
-                        align-items: center;
-                    "
-                >
+                <div>
 
-                    <div>
-
-                        <div
-                            style="
-                                font-size: 22px;
-                                font-weight: 700;
-                            "
-                        >
-                            Detail Service
-                        </div>
-
-                        <div
-                            style="
-                                margin-top: 5px;
-                                opacity: .9;
-                            "
-                        >
-                            Tahun :
-
-                            <b>
-                                {{ $tahun }}
-                            </b>
-
-                            |
-
-                            Jumlah :
-
-                            <b>
-                                {{ $this->services->count() }}
-                            </b>
-
-                            Service
-                        </div>
-
-                    </div>
-
-
-                    {{-- CLOSE BUTTON --}}
-                    <button
-                        type="button"
-                        wire:click="close"
+                    <div
                         style="
-                            background: rgba(255, 255, 255, .2);
-                            border: none;
-                            color: white;
-                            width: 40px;
-                            height: 40px;
-                            border-radius: 50%;
                             font-size: 22px;
-                            cursor: pointer;
-                            line-height: 40px;
+                            font-weight: 700;
                         "
                     >
-                        ×
-                    </button>
+                        Detail Service
+                    </div>
+
+                    <div
+                        style="
+                            margin-top: 5px;
+                            opacity: .9;
+                        "
+                    >
+                        Tahun :
+
+                        <b>
+                            {{ $tahun }}
+                        </b>
+
+                        |
+
+                        Jumlah :
+
+                        <b>
+                            {{ $this->services->count() }}
+                        </b>
+
+                        Service
+                    </div>
 
                 </div>
 
 
-                {{-- CONTENT --}}
-                <div
+                {{-- CLOSE BUTTON --}}
+                <button
+                    type="button"
+                    wire:click="close"
                     style="
-                        padding: 25px;
-                        overflow: auto;
-                        max-height: 65vh;
+                        background: rgba(255, 255, 255, .2);
+                        border: none;
+                        color: white;
+                        width: 40px;
+                        height: 40px;
+                        border-radius: 50%;
+                        font-size: 22px;
+                        cursor: pointer;
+                        line-height: 40px;
+                    "
+                >
+                    ×
+                </button>
+
+            </div>
+
+
+            {{-- CONTENT --}}
+            <div
+                style="
+                    padding: 25px;
+                    overflow: auto;
+                    max-height: 65vh;
+                "
+            >
+
+                <table
+                    style="
+                        width: 100%;
+                        border-collapse: collapse;
                     "
                 >
 
-                    <table
-                        style="
-                            width: 100%;
-                            border-collapse: collapse;
-                        "
-                    >
+                    <thead>
 
-                        <thead>
+                        <tr
+                            style="
+                                background: #f3f4f6;
+                            "
+                        >
+
+                            <th
+                                style="
+                                    padding: 12px;
+                                    text-align: left;
+                                    white-space: nowrap;
+                                "
+                            >
+                                No.
+                            </th>
+
+                            <th
+                                style="
+                                    padding: 12px;
+                                    text-align: left;
+                                    white-space: nowrap;
+                                "
+                            >
+                                No Asset
+                            </th>
+
+                            <th
+                                style="
+                                    padding: 12px;
+                                    text-align: left;
+                                    white-space: nowrap;
+                                "
+                            >
+                                Nama Asset
+                            </th>
+
+                            <th
+                                style="
+                                    padding: 12px;
+                                    text-align: left;
+                                    white-space: nowrap;
+                                "
+                            >
+                                Perusahaan
+                            </th>
+
+                            <th
+                                style="
+                                    padding: 12px;
+                                    text-align: left;
+                                    white-space: nowrap;
+                                "
+                            >
+                                Tanggal Masuk
+                            </th>
+
+                            <th
+                                style="
+                                    padding: 12px;
+                                    text-align: left;
+                                    white-space: nowrap;
+                                "
+                            >
+                                Jenis
+                            </th>
+
+                            <th
+                                style="
+                                    padding: 12px;
+                                    text-align: left;
+                                    white-space: nowrap;
+                                "
+                            >
+                                Tindakan
+                            </th>
+
+                            <th
+                                style="
+                                    padding: 12px;
+                                    text-align: left;
+                                    white-space: nowrap;
+                                "
+                            >
+                                Status
+                            </th>
+
+                            <th
+                                style="
+                                    padding: 12px;
+                                    text-align: left;
+                                    white-space: nowrap;
+                                "
+                            >
+                                Lama
+                            </th>
+
+                            <th
+                                style="
+                                    padding: 12px;
+                                    text-align: right;
+                                    white-space: nowrap;
+                                "
+                            >
+                                Biaya
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        @forelse ($this->services as $index => $service)
 
                             <tr
                                 style="
-                                    background: #f3f4f6;
+                                    border-bottom: 1px solid #e5e7eb;
                                 "
                             >
 
-                                <th
+                                {{-- NO. --}}
+                                <td
                                     style="
                                         padding: 12px;
-                                        text-align: left;
                                         white-space: nowrap;
                                     "
                                 >
-                                    No Asset
-                                </th>
+                                    {{ $index + 1 }}
+                                </td>
 
-                                <th
+
+                                {{-- NO ASSET --}}
+                                <td
                                     style="
                                         padding: 12px;
-                                        text-align: left;
                                         white-space: nowrap;
                                     "
                                 >
-                                    Nama Asset
-                                </th>
+                                    {{ $service->asset?->NoAssetIT ?? '-' }}
+                                </td>
 
-                                <th
+
+                                {{-- NAMA ASSET --}}
+                                <td
                                     style="
                                         padding: 12px;
-                                        text-align: left;
+                                    "
+                                >
+                                    {{ $service->asset?->Nama ?? '-' }}
+                                </td>
+
+
+                                {{-- PERUSAHAAN --}}
+                                <td
+                                    style="
+                                        padding: 12px;
                                         white-space: nowrap;
                                     "
                                 >
-                                    Perusahaan
-                                </th>
+                                    {{ $service->asset?->perusahaan?->NamaPerusahaan ?? '-' }}
+                                </td>
 
-                                <th
+
+                                {{-- TANGGAL MASUK --}}
+                                <td
                                     style="
                                         padding: 12px;
-                                        text-align: left;
                                         white-space: nowrap;
                                     "
                                 >
-                                    Tanggal Masuk
-                                </th>
+                                    {{ $service->TanggalMasuk?->format('d M Y') ?? '-' }}
+                                </td>
 
-                                <th
+
+                                {{-- JENIS SERVICE --}}
+                                <td
                                     style="
                                         padding: 12px;
-                                        text-align: left;
+                                    "
+                                >
+                                    {{ $service->JenisService ?? '-' }}
+                                </td>
+
+
+                                {{-- TINDAKAN --}}
+                                <td
+                                    style="
+                                        padding: 12px;
+                                        min-width: 200px;
+                                    "
+                                >
+                                    {{ $service->Tindakan ?? '-' }}
+                                </td>
+
+
+                                {{-- STATUS --}}
+                                <td
+                                    style="
+                                        padding: 12px;
                                         white-space: nowrap;
                                     "
                                 >
-                                    Jenis
-                                </th>
+                                    {{ $service->StatusService ?? '-' }}
+                                </td>
 
-                                <th
+
+                                {{-- LAMA SERVICE --}}
+                                <td
                                     style="
                                         padding: 12px;
-                                        text-align: left;
                                         white-space: nowrap;
                                     "
                                 >
-                                    Tindakan
-                                </th>
 
-                                <th
-                                    style="
-                                        padding: 12px;
-                                        text-align: left;
-                                        white-space: nowrap;
-                                    "
-                                >
-                                    Status
-                                </th>
+                                    @if ($service->TanggalMasuk && $service->TanggalSelesai)
 
-                                <th
-                                    style="
-                                        padding: 12px;
-                                        text-align: left;
-                                        white-space: nowrap;
-                                    "
-                                >
-                                    Lama
-                                </th>
+                                        {{ $service->TanggalMasuk->diffInDays($service->TanggalSelesai) }}
+                                        Hari
 
-                                <th
+                                    @else
+
+                                        -
+
+                                    @endif
+
+                                </td>
+
+
+                                {{-- BIAYA --}}
+                                <td
                                     style="
                                         padding: 12px;
                                         text-align: right;
                                         white-space: nowrap;
                                     "
                                 >
-                                    Biaya
-                                </th>
+                                    Rp
+                                    {{ number_format(
+                                        $service->Biaya ?? 0,
+                                        0,
+                                        ',',
+                                        '.'
+                                    ) }}
+                                </td>
 
                             </tr>
 
-                        </thead>
+                        @empty
 
+                            <tr>
 
-                        <tbody>
-
-                            @forelse ($this->services as $service)
-
-                                <tr
+                                <td
+                                    colspan="10"
                                     style="
-                                        border-bottom: 1px solid #e5e7eb;
+                                        padding: 30px;
+                                        text-align: center;
+                                        color: #6b7280;
                                     "
                                 >
+                                    Tidak ada data service
+                                </td>
 
-                                    {{-- NO ASSET --}}
-                                    <td
-                                        style="
-                                            padding: 12px;
-                                            white-space: nowrap;
-                                        "
-                                    >
-                                        {{ $service->asset?->NoAssetIT ?? '-' }}
-                                    </td>
+                            </tr>
 
+                        @endforelse
 
-                                    {{-- NAMA ASSET --}}
-                                    <td
-                                        style="
-                                            padding: 12px;
-                                        "
-                                    >
-                                        {{ $service->asset?->Nama ?? '-' }}
-                                    </td>
+                    </tbody>
+
+                </table>
+
+            </div>
 
 
-                                    {{-- PERUSAHAAN --}}
-                                    <td
-                                        style="
-                                            padding: 12px;
-                                            white-space: nowrap;
-                                        "
-                                    >
-                                        {{ $service->asset?->perusahaan?->NamaPerusahaan ?? '-' }}
-                                    </td>
+            {{-- FOOTER --}}
+            <div
+                style="
+                    padding: 15px 25px;
+                    background: #f9fafb;
+                    text-align: right;
+                "
+            >
 
-
-                                    {{-- TANGGAL MASUK --}}
-                                    <td
-                                        style="
-                                            padding: 12px;
-                                            white-space: nowrap;
-                                        "
-                                    >
-                                        {{ $service->TanggalMasuk?->format('d M Y') ?? '-' }}
-                                    </td>
-
-
-                                    {{-- JENIS SERVICE --}}
-                                    <td
-                                        style="
-                                            padding: 12px;
-                                        "
-                                    >
-                                        {{ $service->JenisService ?? '-' }}
-                                    </td>
-
-
-                                    {{-- TINDAKAN --}}
-                                    <td
-                                        style="
-                                            padding: 12px;
-                                            min-width: 200px;
-                                        "
-                                    >
-                                        {{ $service->Tindakan ?? '-' }}
-                                    </td>
-
-
-                                    {{-- STATUS --}}
-                                    <td
-                                        style="
-                                            padding: 12px;
-                                            white-space: nowrap;
-                                        "
-                                    >
-                                        {{ $service->StatusService ?? '-' }}
-                                    </td>
-
-
-                                    {{-- LAMA SERVICE --}}
-                                    <td
-                                        style="
-                                            padding: 12px;
-                                            white-space: nowrap;
-                                        "
-                                    >
-
-                                        @if ($service->TanggalMasuk && $service->TanggalSelesai)
-
-                                            {{ $service->TanggalMasuk->diffInDays($service->TanggalSelesai) }}
-                                            Hari
-
-                                        @else
-
-                                            -
-
-                                        @endif
-
-                                    </td>
-
-
-                                    {{-- BIAYA --}}
-                                    <td
-                                        style="
-                                            padding: 12px;
-                                            text-align: right;
-                                            white-space: nowrap;
-                                        "
-                                    >
-                                        Rp
-                                        {{ number_format(
-                                            $service->Biaya ?? 0,
-                                            0,
-                                            ',',
-                                            '.'
-                                        ) }}
-                                    </td>
-
-                                </tr>
-
-                            @empty
-
-                                <tr>
-
-                                    <td
-                                        colspan="9"
-                                        style="
-                                            padding: 30px;
-                                            text-align: center;
-                                            color: #6b7280;
-                                        "
-                                    >
-                                        Tidak ada data service
-                                    </td>
-
-                                </tr>
-
-                            @endforelse
-
-                        </tbody>
-
-                    </table>
-
-                </div>
-
-
-                {{-- FOOTER --}}
-                <div
+                <button
+                    type="button"
+                    wire:click="close"
                     style="
-                        padding: 15px 25px;
-                        background: #f9fafb;
-                        text-align: right;
+                        background: #374151;
+                        color: white;
+                        border: none;
+                        padding: 10px 20px;
+                        border-radius: 10px;
+                        cursor: pointer;
                     "
                 >
-
-                    <button
-                        type="button"
-                        wire:click="close"
-                        style="
-                            background: #374151;
-                            color: white;
-                            border: none;
-                            padding: 10px 20px;
-                            border-radius: 10px;
-                            cursor: pointer;
-                        "
-                    >
-                        Tutup
-                    </button>
-
-                </div>
+                    Tutup
+                </button>
 
             </div>
 
         </div>
 
-    @endif
+    </div>
+
+@endif
 
 </div>

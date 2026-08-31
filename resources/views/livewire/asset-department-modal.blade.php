@@ -274,6 +274,16 @@
                                 white-space:nowrap;
                             "
                         >
+                            No.
+                        </th>
+
+                        <th
+                            style="
+                                padding:12px;
+                                text-align:left;
+                                white-space:nowrap;
+                            "
+                        >
                             No Asset
                         </th>
 
@@ -364,13 +374,17 @@
 
                 <tbody>
 
-                @forelse($this->assets as $asset)
+                @forelse($this->assets as $index => $asset)
 
                     <tr
                         style="
                             border-bottom:1px solid #e5e7eb;
                         "
                     >
+
+                        <td style="padding:12px">
+                            {{ $index + 1 }}
+                        </td>
 
                         <td style="padding:12px">
                             {{ $asset->NoAssetIT }}
@@ -415,7 +429,7 @@
                     <tr>
 
                         <td
-                            colspan="9"
+                            colspan="10"
                             style="
                                 padding:30px;
                                 text-align:center;
