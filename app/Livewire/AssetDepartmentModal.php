@@ -15,6 +15,8 @@ class AssetDepartmentModal extends Component
 
     public ?string $department = null;
 
+    public string $statusAsset = 'all';
+
     #[On('open-asset-department-modal')]
     public function open(
         $departmentId = null,
@@ -27,6 +29,8 @@ class AssetDepartmentModal extends Component
 
         $this->department = $department;
 
+        $this->statusAsset = 'all';
+
         $this->show = true;
     }
 
@@ -37,6 +41,8 @@ class AssetDepartmentModal extends Component
         $this->departmentId = null;
 
         $this->department = null;
+
+        $this->statusAsset = 'all';
     }
 
     public function getAssetsProperty()
@@ -74,6 +80,17 @@ class AssetDepartmentModal extends Component
                                     ->select('NIK')
                             );
                     });
+                }
+            )
+
+            // Filter Status Asset
+            ->when(
+                $this->statusAsset !== 'all',
+                function ($query) {
+                    $query->where(
+                        'StatusAsset',
+                        $this->statusAsset
+                    );
                 }
             )
 

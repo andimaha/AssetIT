@@ -82,6 +82,13 @@
 
                     |
 
+                    Status :
+                    <b>
+                        {{ $statusAsset === 'all' ? 'Semua Status' : $statusAsset }}
+                    </b>
+
+                    |
+
                     Total :
                     <b>
                         {{ $this->assets->count() }}
@@ -109,6 +116,69 @@
             >
                 ×
             </button>
+
+        </div>
+
+
+        {{-- FILTER --}}
+        <div
+            style="
+                padding:20px 25px 0 25px;
+                background:white;
+            "
+        >
+
+            <div
+                style="
+                    display:flex;
+                    align-items:center;
+                    gap:12px;
+                "
+            >
+
+                <label
+                    style="
+                        font-weight:600;
+                        color:#374151;
+                        white-space:nowrap;
+                    "
+                >
+                    Status Asset
+                </label>
+
+
+                <select
+                    wire:model.live="statusAsset"
+                    style="
+                        padding:9px 35px 9px 12px;
+                        border:1px solid #d1d5db;
+                        border-radius:8px;
+                        background:white;
+                        color:#374151;
+                        min-width:180px;
+                        outline:none;
+                    "
+                >
+
+                    <option value="all">
+                        Semua Status
+                    </option>
+
+                    <option value="Available">
+                        Available
+                    </option>
+
+                    <option value="In Service">
+                        In Service
+                    </option>
+
+                    <option value="Retired">
+                        Retired
+                    </option>
+
+                </select>
+
+            </div>
 
         </div>
 

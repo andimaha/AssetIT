@@ -139,6 +139,10 @@
                         </th>
 
                         <th style="padding:12px;text-align:left">
+                            ID License
+                        </th>
+
+                        <th style="padding:12px;text-align:left">
                             NIK
                         </th>
 
@@ -198,6 +202,10 @@
 
                         <td style="padding:12px">
                             {{ $assignment->Version ?? '-' }}
+                        </td>
+
+                        <td style="padding:12px">
+                            {{ $assignment->IDLicense ?? '-' }}
                         </td>
 
                         <td style="padding:12px">
@@ -263,7 +271,7 @@
                     <tr>
 
                         <td
-                            colspan="11"
+                            colspan="12"
                             style="
                                 padding:30px;
                                 text-align:center;
