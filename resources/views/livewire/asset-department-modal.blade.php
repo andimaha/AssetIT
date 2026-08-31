@@ -1,3 +1,7 @@
+@php
+    use App\Models\MstPerusahaan;
+@endphp
+
 <div>
 
 @if($show)
@@ -89,6 +93,17 @@
 
                     |
 
+                    Perusahaan :
+                    <b>
+                        @if($company === 'all')
+                            Semua Perusahaan
+                        @else
+                            {{ MstPerusahaan::find($company)?->NamaPerusahaan ?? '-' }}
+                        @endif
+                    </b>
+
+                    |
+
                     Total :
                     <b>
                         {{ $this->assets->count() }}
@@ -133,6 +148,7 @@
                     display:flex;
                     align-items:center;
                     gap:12px;
+                    flex-wrap:wrap;
                 "
             >
 
@@ -175,6 +191,50 @@
                     <option value="Retired">
                         Retired
                     </option>
+
+                </select>
+
+
+                <label
+                    style="
+                        font-weight:600;
+                        color:#374151;
+                        white-space:nowrap;
+                    "
+                >
+                    Perusahaan
+                </label>
+
+
+                <select
+                    wire:model.live="company"
+                    style="
+                        padding:9px 35px 9px 12px;
+                        border:1px solid #d1d5db;
+                        border-radius:8px;
+                        background:white;
+                        color:#374151;
+                        min-width:220px;
+                        outline:none;
+                    "
+                >
+
+                    <option value="all">
+                        Semua Perusahaan
+                    </option>
+
+                    @foreach(
+                        MstPerusahaan::query()
+                            ->orderBy('NamaPerusahaan')
+                            ->get()
+                        as $perusahaan
+                    )
+
+                        <option value="{{ $perusahaan->IDPerusahaan }}">
+                            {{ $perusahaan->NamaPerusahaan }}
+                        </option>
+
+                    @endforeach
 
                 </select>
 

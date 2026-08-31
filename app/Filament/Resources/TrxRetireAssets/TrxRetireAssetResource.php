@@ -11,6 +11,7 @@ use App\Models\TrxRetireAsset;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
+use Filament\Support\Icons\Heroicon;
 
 
 class TrxRetireAssetResource extends Resource
@@ -28,6 +29,10 @@ class TrxRetireAssetResource extends Resource
 
 
     protected static ?string $pluralModelLabel = 'Retire Asset';
+
+
+    protected static string|\BackedEnum|null $navigationIcon =
+        Heroicon::OutlinedArchiveBoxXMark;
 
 
 

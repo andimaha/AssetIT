@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\MstAsset;
 use App\Models\MstKaryawan;
+use App\Models\MstPerusahaan;
 use Livewire\Component;
 use Livewire\Attributes\On;
 
@@ -16,6 +17,8 @@ class AssetDepartmentModal extends Component
     public ?string $department = null;
 
     public string $statusAsset = 'all';
+
+    public string $company = 'all';
 
     #[On('open-asset-department-modal')]
     public function open(
@@ -31,6 +34,8 @@ class AssetDepartmentModal extends Component
 
         $this->statusAsset = 'all';
 
+        $this->company = 'all';
+
         $this->show = true;
     }
 
@@ -43,6 +48,8 @@ class AssetDepartmentModal extends Component
         $this->department = null;
 
         $this->statusAsset = 'all';
+
+        $this->company = 'all';
     }
 
     public function getAssetsProperty()
@@ -90,6 +97,17 @@ class AssetDepartmentModal extends Component
                     $query->where(
                         'StatusAsset',
                         $this->statusAsset
+                    );
+                }
+            )
+
+            // Filter Perusahaan
+            ->when(
+                $this->company !== 'all',
+                function ($query) {
+                    $query->where(
+                        'IDPerusahaan',
+                        $this->company
                     );
                 }
             )

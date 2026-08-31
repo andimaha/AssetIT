@@ -11,6 +11,7 @@ use App\Models\TrxMutasiAsset;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
+use Filament\Support\Icons\Heroicon;
 
 
 class TrxMutasiAssetResource extends Resource
@@ -28,6 +29,10 @@ class TrxMutasiAssetResource extends Resource
 
 
     protected static ?string $pluralModelLabel = 'Mutasi Asset';
+
+
+    protected static string|\BackedEnum|null $navigationIcon =
+        Heroicon::OutlinedArrowsRightLeft;
 
 
     public static function form(Schema $schema): Schema

@@ -60,7 +60,7 @@ class TrxSoftwareAssignmentResource extends Resource
 
 
     protected static string|\UnitEnum|null $navigationGroup =
-        'Software Management';
+        'Asset Management';
 
 
 
