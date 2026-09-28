@@ -4,6 +4,7 @@ namespace App\Filament\Resources\MstIsp\Schemas;
 
 use App\Models\MstLokasi;
 use App\Models\MstVendor;
+use App\Models\MstPerusahaan;
 
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
@@ -95,6 +96,24 @@ class MstIspForm
                             ->preload()
                             ->required()
                             ->placeholder('Pilih vendor'),
+
+                        /*
+|--------------------------------------------------------------------------
+| PERUSAHAAN
+|--------------------------------------------------------------------------
+*/
+
+Select::make('IDPerusahaan')
+    ->label('Perusahaan')
+    ->relationship(
+        name: 'perusahaan',
+        titleAttribute: 'NamaPerusahaan'
+    )
+    ->searchable()
+    ->preload()
+    ->required()
+    ->placeholder('Pilih perusahaan'),
+
 
                         /*
                         |--------------------------------------------------------------------------

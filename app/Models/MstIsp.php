@@ -24,6 +24,7 @@ class MstIsp extends Model
         'ConnectionType',
         'NamaISP',
         'IDVendor',
+        'IDPerusahaan',
         'IDLokasi',
         'MediaType',
         'ContractStart',
@@ -37,6 +38,7 @@ class MstIsp extends Model
     protected $casts = [
         'IDISP' => 'integer',
         'IDVendor' => 'integer',
+        'IDPerusahaan' => 'integer',
         'IDLokasi' => 'integer',
         'ContractStart' => 'date',
         'ContractEnd' => 'date',
@@ -56,6 +58,18 @@ class MstIsp extends Model
             MstVendor::class,
             'IDVendor',
             'IDVendor'
+        );
+    }
+
+    /**
+     * Relasi ke perusahaan.
+     */
+    public function perusahaan()
+    {
+        return $this->belongsTo(
+            MstPerusahaan::class,
+            'IDPerusahaan',
+            'IDPerusahaan'
         );
     }
 

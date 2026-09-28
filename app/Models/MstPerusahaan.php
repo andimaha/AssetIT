@@ -48,4 +48,17 @@ class MstPerusahaan extends Model
             'IDPerusahaan'
         );
     }
+
+    /**
+ * Relasi ke ISP.
+ */
+public function isps()
+{
+    return $this->hasMany(
+        MstIsp::class,
+        'IDPerusahaan',
+        'IDPerusahaan'
+    );
+}
+
 }

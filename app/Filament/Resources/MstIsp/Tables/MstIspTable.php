@@ -31,13 +31,13 @@ class MstIspTable
                 TextColumn::make('ConnectionType')
                     ->label('Tipe Koneksi')
                     ->badge()
-                    ->color(fn (?string $state): string => match ($state) {
+                    ->color(fn(?string $state): string => match ($state) {
                         'PRIMARY' => 'success',
                         'BACKUP' => 'warning',
                         default => 'gray',
                     })
                     ->formatStateUsing(
-                        fn (?string $state): string => match ($state) {
+                        fn(?string $state): string => match ($state) {
                             'PRIMARY' => 'Primary',
                             'BACKUP' => 'Backup',
                             default => '-',
@@ -56,6 +56,11 @@ class MstIspTable
                     ->searchable()
                     ->sortable(),
 
+                TextColumn::make('perusahaan.NamaPerusahaan')
+                    ->label('Perusahaan')
+                    ->searchable()
+                    ->sortable(),
+
                 TextColumn::make('lokasi.NamaLokasi')
                     ->label('Lokasi')
                     ->searchable()
@@ -64,7 +69,7 @@ class MstIspTable
                 TextColumn::make('MediaType')
                     ->label('Media')
                     ->badge()
-                    ->color(fn (?string $state): string => match ($state) {
+                    ->color(fn(?string $state): string => match ($state) {
                         'Fiber Optic' => 'success',
                         'Wireless' => 'info',
                         'Radio' => 'warning',
@@ -118,6 +123,16 @@ class MstIspTable
                         'PRIMARY' => 'Primary',
                         'BACKUP' => 'Backup',
                     ]),
+
+                SelectFilter::make('IDPerusahaan')
+                    ->label('Perusahaan')
+                    ->relationship(
+                        name: 'perusahaan',
+                        titleAttribute: 'NamaPerusahaan'
+                    )
+                    ->searchable()
+                    ->preload(),
+
 
                 SelectFilter::make('MediaType')
                     ->label('Media')
