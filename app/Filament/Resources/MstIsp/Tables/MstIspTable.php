@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\MstIsp\Tables;
 
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
@@ -13,12 +14,12 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
-
 class MstIspTable
 {
     public static function configure(Table $table): Table
     {
         return $table
+
             ->columns([
 
                 TextColumn::make('ISPCode')
@@ -31,13 +32,15 @@ class MstIspTable
                 TextColumn::make('ConnectionType')
                     ->label('Tipe Koneksi')
                     ->badge()
-                    ->color(fn(?string $state): string => match ($state) {
-                        'PRIMARY' => 'success',
-                        'BACKUP' => 'warning',
-                        default => 'gray',
-                    })
+                    ->color(
+                        fn (?string $state): string => match ($state) {
+                            'PRIMARY' => 'success',
+                            'BACKUP' => 'warning',
+                            default => 'gray',
+                        }
+                    )
                     ->formatStateUsing(
-                        fn(?string $state): string => match ($state) {
+                        fn (?string $state): string => match ($state) {
                             'PRIMARY' => 'Primary',
                             'BACKUP' => 'Backup',
                             default => '-',
@@ -69,13 +72,15 @@ class MstIspTable
                 TextColumn::make('MediaType')
                     ->label('Media')
                     ->badge()
-                    ->color(fn(?string $state): string => match ($state) {
-                        'Fiber Optic' => 'success',
-                        'Wireless' => 'info',
-                        'Radio' => 'warning',
-                        'Satellite' => 'gray',
-                        default => 'gray',
-                    }),
+                    ->color(
+                        fn (?string $state): string => match ($state) {
+                            'Fiber Optic' => 'success',
+                            'Wireless' => 'info',
+                            'Radio' => 'warning',
+                            'Satellite' => 'gray',
+                            default => 'gray',
+                        }
+                    ),
 
                 TextColumn::make('ContractStart')
                     ->label('Mulai Kontrak')
@@ -133,7 +138,6 @@ class MstIspTable
                     ->searchable()
                     ->preload(),
 
-
                 SelectFilter::make('MediaType')
                     ->label('Media')
                     ->options([
@@ -155,16 +159,36 @@ class MstIspTable
             ])
 
             ->recordActions([
+
+                /*
+                 * View
+                 */
                 ViewAction::make(),
+
+                /*
+                 * Edit
+                 */
                 EditAction::make(),
+
+                /*
+                 * Delete
+                 */
+                DeleteAction::make(),
+
             ])
 
             ->toolbarActions([
+
                 BulkActionGroup::make([
+
                     DeleteBulkAction::make(),
+
                 ]),
+
             ])
 
-            ->defaultSort('NamaISP');
+            ->defaultSort(
+                'NamaISP'
+            );
     }
 }
