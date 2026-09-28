@@ -134,10 +134,7 @@ class ItRequestForm
         |
         */
 
-        $isRequestLocked = function ($record) use (
-            $isCompletedAndLocked,
-            $isRejectedAndLocked
-        ): bool {
+        $isRequestLocked = function ($record) use ($isCompletedAndLocked, $isRejectedAndLocked): bool {
 
             return
                 $isCompletedAndLocked($record)
@@ -258,24 +255,48 @@ class ItRequestForm
                                 'assets',
                                 'NoAssetIT',
                                 modifyQueryUsing: function (Builder $query) {
-                                    $query->with('karyawan');
+                                    $query->with([
+                                        'karyawan.departemen',
+                                    ]);
                                 }
                             )
                             ->getOptionLabelFromRecordUsing(
                                 function ($record): string {
+
+                                    $dept =
+                                        $record
+                                            ->karyawan
+                                            ?->departemen
+                                                ?->NamaDept
+                                        ?? $record
+                                            ->karyawan
+                                            ?->departemen
+                                                ?->NamaDepartemen
+                                        ?? '-';
+
                                     return
                                         ($record->NoAssetIT ?? '-')
                                         . ' | '
                                         . ($record->Nama ?? '-')
                                         . ' | '
-                                        . ($record->karyawan?->Nama ?? '-');
+                                        . (
+                                            $record
+                                                ->karyawan
+                                                    ?->Nama
+                                            ?? '-'
+                                        )
+                                        . ' | '
+                                        . $dept;
                                 }
                             )
                             ->searchable()
                             ->getSearchResultsUsing(
                                 function (string $search): array {
+
                                     return MstAsset::query()
-                                        ->with('karyawan')
+                                        ->with([
+                                            'karyawan.departemen',
+                                        ])
                                         ->where(
                                             function (Builder $query) use ($search) {
 
@@ -303,7 +324,24 @@ class ItRequestForm
                                                                 'mstkaryawan.Nama',
                                                                 'like',
                                                                 "%{$search}%"
-                                                            );
+                                                            )
+                                                                ->orWhereHas(
+                                                                    'departemen',
+                                                                    function (Builder $query) use ($search) {
+
+                                                                        $query
+                                                                            ->where(
+                                                                                'mstdepartemen.NamaDept',
+                                                                                'like',
+                                                                                "%{$search}%"
+                                                                            )
+                                                                            ->orWhere(
+                                                                                'mstdepartemen.NamaDepartemen',
+                                                                                'like',
+                                                                                "%{$search}%"
+                                                                            );
+                                                                    }
+                                                                );
                                                         }
                                                     );
                                             }
@@ -312,6 +350,18 @@ class ItRequestForm
                                         ->get()
                                         ->mapWithKeys(
                                             function ($asset) {
+
+                                                $dept =
+                                                    $asset
+                                                        ->karyawan
+                                                        ?->departemen
+                                                            ?->NamaDept
+                                                    ?? $asset
+                                                        ->karyawan
+                                                        ?->departemen
+                                                            ?->NamaDepartemen
+                                                    ?? '-';
+
                                                 return [
                                                     $asset->NoAssetIT =>
                                                         ($asset->NoAssetIT ?? '-')
@@ -323,7 +373,9 @@ class ItRequestForm
                                                                 ->karyawan
                                                                     ?->Nama
                                                             ?? '-'
-                                                        ),
+                                                        )
+                                                        . ' | '
+                                                        . $dept,
                                                 ];
                                             }
                                         )
@@ -340,6 +392,7 @@ class ItRequestForm
                                 'Asset dapat dipilih lebih dari satu.'
                             )
                             ->columnSpanFull(),
+
 
                         /*
                         |--------------------------------------------------------------------------
@@ -492,9 +545,9 @@ class ItRequestForm
                                 function ($state, $record): string {
 
                                     return match (
-                                        $record
-                                            ?->approval
-                                                ?->status
+                                    $record
+                                        ?->approval
+                                            ?->status
                                     ) {
 
                                         'pending' =>
@@ -651,10 +704,7 @@ class ItRequestForm
                                     auth()->id()
                             )
                             ->afterStateHydrated(
-                                function (
-                                    Select $component,
-                                    $state
-                                ): void {
+                                function (Select $component, $state): void {
 
                                     if (
                                         blank($state)
@@ -712,7 +762,7 @@ class ItRequestForm
                                         $record
                                         && $record
                                             ->approval
-                                            ?->status === 'approved'
+                                                ?->status === 'approved'
                                     ) {
 
                                         $options = [
@@ -756,8 +806,8 @@ class ItRequestForm
                                             $options = [
                                                 $record->Status =>
                                                     $record->Status === 'disetujui'
-                                                        ? 'Disetujui'
-                                                        : 'Ditolak',
+                                                    ? 'Disetujui'
+                                                    : 'Ditolak',
 
                                                 ...$options,
                                             ];
@@ -789,17 +839,14 @@ class ItRequestForm
                             )
 
                             ->disableOptionWhen(
-                                function (
-                                    $value,
-                                    $record
-                                ): bool {
+                                function ($value, $record): bool {
 
                                     if (
                                         !$record
                                         ||
                                         $record
                                             ->approval
-                                            ?->status !== 'approved'
+                                                ?->status !== 'approved'
                                     ) {
                                         return false;
                                     }
@@ -835,10 +882,7 @@ class ItRequestForm
                             */
 
                             ->disabled(
-                                function ($record) use (
-                                    $isCompletedAndLocked,
-                                    $isRejectedAndLocked
-                                ): bool {
+                                function ($record) use ($isCompletedAndLocked, $isRejectedAndLocked): bool {
 
                                     /*
                                     |--------------------------------------------------------------------------
@@ -895,10 +939,7 @@ class ItRequestForm
                             ->dehydrated()
 
                             ->helperText(
-                                function ($record) use (
-                                    $isCompletedAndLocked,
-                                    $isRejectedAndLocked
-                                ): ?string {
+                                function ($record) use ($isCompletedAndLocked, $isRejectedAndLocked): ?string {
 
                                     if (!$record) {
                                         return null;
@@ -979,10 +1020,7 @@ class ItRequestForm
                             ->live()
 
                             ->afterStateUpdated(
-                                function (
-                                    $state,
-                                    callable $set
-                                ): void {
+                                function ($state, callable $set): void {
 
                                     /*
                                     |--------------------------------------------------------------------------
@@ -1088,15 +1126,12 @@ class ItRequestForm
                                 'Serah Terima'
                             )
                             ->formatStateUsing(
-                                function (
-                                    $state,
-                                    $record
-                                ): string {
+                                function ($state, $record): string {
 
                                     return
                                         $record?->SerahTerima
-                                            ? 'Sudah Serah Terima'
-                                            : 'Belum Serah Terima';
+                                        ? 'Sudah Serah Terima'
+                                        : 'Belum Serah Terima';
                                 }
                             )
                             ->disabled()
@@ -1139,10 +1174,7 @@ class ItRequestForm
                                 'Catatan'
                             )
                             ->formatStateUsing(
-                                function (
-                                    $state,
-                                    $record
-                                ): string {
+                                function ($state, $record): string {
 
                                     if (!$record) {
                                         return '-';
@@ -1165,9 +1197,7 @@ class ItRequestForm
 
                                     return $notes
                                         ->map(
-                                            function (
-                                                $note
-                                            ): string {
+                                            function ($note): string {
 
                                                 $user =
                                                     $note->user;
@@ -1194,15 +1224,15 @@ class ItRequestForm
 
                                                 $tanggal =
                                                     $note->created_at
-                                                        ?->format(
+                                                            ?->format(
                                                             'd/m/Y H:i'
                                                         )
                                                     ?? '-';
 
                                                 $catatan =
                                                     trim(
-                                                        (string)
-                                                            $note->catatan
+                                                        (string) 
+                                                        $note->catatan
                                                     );
 
                                                 return
@@ -1210,8 +1240,8 @@ class ItRequestForm
                                                     . "{$nik} | {$nama} | {$dept}\n"
                                                     . (
                                                         $catatan !== ''
-                                                            ? $catatan
-                                                            : '-'
+                                                        ? $catatan
+                                                        : '-'
                                                     );
                                             }
                                         )
