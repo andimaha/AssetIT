@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\ItRequest;
+use App\Models\MstJenisPermintaan;
 use Carbon\Carbon;
 use Livewire\Component;
 
@@ -10,11 +11,20 @@ class ItRequestDetailModal extends Component
 {
     public bool $show = false;
 
-    public ?string $jenis = null;
-
     public ?string $bulan = null;
 
     public ?string $filter = null;
+
+    /*
+    |--------------------------------------------------------------------------
+    | FILTER JENIS
+    |--------------------------------------------------------------------------
+    |
+    | null / kosong = semua jenis
+    |
+    */
+
+    public ?string $jenisFilter = null;
 
 
     /*
@@ -24,10 +34,7 @@ class ItRequestDetailModal extends Component
     */
 
     protected $listeners = [
-
-        'open-it-request-detail-modal' =>
-            'open',
-
+        'open-it-request-detail-modal' => 'open',
     ];
 
 
@@ -37,24 +44,25 @@ class ItRequestDetailModal extends Component
     |--------------------------------------------------------------------------
     */
 
-    public function open(
-        $jenis,
-        $bulan,
-        $filter
-    ): void {
+    public function open($bulan, $filter): void
+    {
+        $this->bulan = $bulan;
 
-        $this->jenis =
-            $jenis;
+        $this->filter = $filter;
 
-        $this->bulan =
-            $bulan;
+        /*
+        |--------------------------------------------------------------------------
+        | RESET FILTER JENIS
+        |--------------------------------------------------------------------------
+        |
+        | Setiap modal dibuka dari chart, filter jenis
+        | dikembalikan ke semua jenis.
+        |
+        */
 
-        $this->filter =
-            $filter;
+        $this->jenisFilter = null;
 
-        $this->show =
-            true;
-
+        $this->show = true;
     }
 
 
@@ -67,6 +75,45 @@ class ItRequestDetailModal extends Component
     public function close(): void
     {
         $this->show = false;
+
+        $this->bulan = null;
+
+        $this->filter = null;
+
+        $this->jenisFilter = null;
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | RESET FILTER JENIS
+    |--------------------------------------------------------------------------
+    */
+
+    public function resetJenisFilter(): void
+    {
+        $this->jenisFilter = null;
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | JENIS OPTIONS
+    |--------------------------------------------------------------------------
+    |
+    | Ambil semua jenis aktif.
+    |
+    */
+
+    public function getJenisOptionsProperty()
+    {
+        return MstJenisPermintaan::query()
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get([
+                'id',
+                'name',
+            ]);
     }
 
 
@@ -78,14 +125,14 @@ class ItRequestDetailModal extends Component
 
     public function getRequestsProperty()
     {
-        if (
-            blank($this->jenis)
-            ||
-            blank($this->bulan)
-        ) {
+        /*
+        |--------------------------------------------------------------------------
+        | VALIDASI
+        |--------------------------------------------------------------------------
+        */
 
+        if (blank($this->bulan)) {
             return collect();
-
         }
 
 
@@ -95,58 +142,91 @@ class ItRequestDetailModal extends Component
         |--------------------------------------------------------------------------
         */
 
-        if (
-            str_contains(
-                $this->filter ?? '',
-                '-'
-            )
-        ) {
+        $year = now()->year;
 
-            [$year] =
-                array_map(
-                    'intval',
-                    explode(
-                        '-',
-                        $this->filter
-                    )
-                );
 
-        } else {
+        if (filled($this->filter)) {
 
-            $year =
-                (int) (
+            /*
+            |--------------------------------------------------------------------------
+            | FILTER BULAN
+            |--------------------------------------------------------------------------
+            |
+            | Contoh:
+            | 2026-09
+            |
+            */
+
+            if (
+                preg_match(
+                    '/^(\d{4})-(\d{2})$/',
+                    $this->filter,
+                    $matches
+                )
+            ) {
+
+                $year = (int) $matches[1];
+            }
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | FILTER TAHUN
+            |--------------------------------------------------------------------------
+            |
+            | Contoh:
+            | 2026
+            |
+            */
+
+            elseif (
+                preg_match(
+                    '/^\d{4}$/',
                     $this->filter
-                    ??
-                    now()->year
-                );
+                )
+            ) {
 
+                $year = (int) $this->filter;
+            }
         }
 
 
         /*
         |--------------------------------------------------------------------------
-        | BULAN DARI LABEL CHART
+        | CARI NOMOR BULAN
         |--------------------------------------------------------------------------
         */
 
-        $monthNumber =
-            collect(
-                range(1, 12)
-            )
-            ->first(
-                function ($month) {
+        $monthNumber = null;
 
-                    return
-                        Carbon::create(
-                            null,
-                            $month,
-                            1
-                        )->translatedFormat('F')
-                        ===
-                        $this->bulan;
 
-                }
-            );
+        for ($month = 1; $month <= 12; $month++) {
+
+            $monthName = Carbon::create(
+                $year,
+                $month,
+                1
+            )->translatedFormat('F');
+
+
+            if ($monthName === $this->bulan) {
+
+                $monthNumber = $month;
+
+                break;
+            }
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | VALIDASI BULAN
+        |--------------------------------------------------------------------------
+        */
+
+        if (! $monthNumber) {
+            return collect();
+        }
 
 
         /*
@@ -155,43 +235,59 @@ class ItRequestDetailModal extends Component
         |--------------------------------------------------------------------------
         */
 
-        return ItRequest::query()
-
+        $query = ItRequest::query()
             ->with([
                 'pemohon.karyawan.departemen',
                 'jenisPermintaan',
                 'penyelesai.karyawan',
             ])
-
             ->whereYear(
                 'created_at',
                 $year
             )
-
             ->whereMonth(
                 'created_at',
                 $monthNumber
-            )
+            );
 
-            ->whereHas(
+
+        /*
+        |--------------------------------------------------------------------------
+        | FILTER JENIS
+        |--------------------------------------------------------------------------
+        |
+        | Karena satu request dapat memiliki banyak jenis,
+        | gunakan whereHas().
+        |
+        */
+
+        if (filled($this->jenisFilter)) {
+
+            $query->whereHas(
                 'jenisPermintaan',
-                function ($query) {
+                function ($jenisQuery) {
 
-                    $query->where(
-                        'mstjenispermintaan.name',
-                        $this->jenis
+                    $jenisQuery->where(
+                        'mstjenispermintaan.id',
+                        $this->jenisFilter
                     );
-
                 }
-            )
+            );
+        }
 
+
+        /*
+        |--------------------------------------------------------------------------
+        | RETURN
+        |--------------------------------------------------------------------------
+        */
+
+        return $query
             ->orderBy(
                 'created_at',
                 'desc'
             )
-
             ->get();
-
     }
 
 

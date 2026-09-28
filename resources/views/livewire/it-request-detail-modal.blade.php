@@ -32,8 +32,8 @@
         style="
             position:relative;
             width:94%;
-            max-width:1200px;
-            max-height:88vh;
+            max-width:1400px;
+            max-height:90vh;
             background:white;
             border-radius:18px;
             overflow:hidden;
@@ -79,11 +79,6 @@
                     "
                 >
 
-                    Jenis:
-                    <b>{{ $jenis ?? '-' }}</b>
-
-                    &nbsp; | &nbsp;
-
                     Bulan:
                     <b>{{ $bulan ?? '-' }}</b>
 
@@ -120,13 +115,116 @@
         </div>
 
 
+        {{-- FILTER --}}
+
+        <div
+            style="
+                padding:18px 25px;
+                background:#fafafa;
+                border-bottom:1px solid #e5e7eb;
+            "
+        >
+
+            <div
+                style="
+                    display:flex;
+                    align-items:end;
+                    gap:15px;
+                    flex-wrap:wrap;
+                "
+            >
+
+                {{-- FILTER JENIS --}}
+
+                <div
+                    style="
+                        min-width:280px;
+                        max-width:420px;
+                    "
+                >
+
+                    <label
+                        for="jenisFilter"
+                        style="
+                            display:block;
+                            margin-bottom:7px;
+                            font-size:13px;
+                            font-weight:600;
+                            color:#374151;
+                        "
+                    >
+                        Filter Jenis
+                    </label>
+
+
+                    <select
+                        id="jenisFilter"
+                        wire:model.live="jenisFilter"
+                        style="
+                            width:100%;
+                            padding:10px 12px;
+                            border:1px solid #d1d5db;
+                            border-radius:10px;
+                            background:white;
+                            color:#111827;
+                            outline:none;
+                        "
+                    >
+
+                        <option value="">
+                            Semua Jenis
+                        </option>
+
+
+                        @foreach($this->jenisOptions as $jenis)
+
+                            <option
+                                value="{{ $jenis->id }}"
+                            >
+                                {{ $jenis->name }}
+                            </option>
+
+                        @endforeach
+
+                    </select>
+
+                </div>
+
+
+                {{-- RESET FILTER --}}
+
+                @if(filled($jenisFilter))
+
+                    <button
+                        type="button"
+                        wire:click="resetJenisFilter"
+                        style="
+                            background:#6b7280;
+                            color:white;
+                            border:none;
+                            padding:10px 16px;
+                            border-radius:10px;
+                            cursor:pointer;
+                            height:40px;
+                        "
+                    >
+                        Reset Filter
+                    </button>
+
+                @endif
+
+            </div>
+
+        </div>
+
+
         {{-- CONTENT --}}
 
         <div
             style="
                 padding:25px;
                 overflow:auto;
-                max-height:68vh;
+                max-height:65vh;
             "
         >
 
@@ -134,6 +232,7 @@
                 style="
                     width:100%;
                     border-collapse:collapse;
+                    min-width:1050px;
                 "
             >
 
@@ -155,14 +254,17 @@
                             No.
                         </th>
 
+
                         <th
                             style="
                                 padding:12px;
                                 text-align:left;
+                                white-space:nowrap;
                             "
                         >
                             No. Request
                         </th>
+
 
                         <th
                             style="
@@ -173,6 +275,7 @@
                             Pemohon
                         </th>
 
+
                         <th
                             style="
                                 padding:12px;
@@ -182,14 +285,30 @@
                             Departemen
                         </th>
 
+
+                        {{-- JENIS --}}
+
                         <th
                             style="
                                 padding:12px;
                                 text-align:left;
+                                min-width:180px;
+                            "
+                        >
+                            Jenis
+                        </th>
+
+
+                        <th
+                            style="
+                                padding:12px;
+                                text-align:left;
+                                min-width:250px;
                             "
                         >
                             Permintaan
                         </th>
+
 
                         <th
                             style="
@@ -199,6 +318,7 @@
                         >
                             Status
                         </th>
+
 
                         <th
                             style="
@@ -228,6 +348,8 @@
                             "
                         >
 
+                            {{-- NO --}}
+
                             <td
                                 style="
                                     padding:12px;
@@ -237,15 +359,20 @@
                             </td>
 
 
+                            {{-- NO REQUEST --}}
+
                             <td
                                 style="
                                     padding:12px;
                                     font-weight:600;
+                                    white-space:nowrap;
                                 "
                             >
                                 {{ $request->NoRequest ?? '-' }}
                             </td>
 
+
+                            {{-- PEMOHON --}}
 
                             <td
                                 style="
@@ -269,6 +396,8 @@
                             </td>
 
 
+                            {{-- DEPARTEMEN --}}
+
                             <td
                                 style="
                                     padding:12px;
@@ -288,6 +417,71 @@
                             </td>
 
 
+                            {{-- JENIS --}}
+
+                            <td
+                                style="
+                                    padding:12px;
+                                    vertical-align:top;
+                                "
+                            >
+
+                                @if(
+                                    $request
+                                        ->jenisPermintaan
+                                        ->isNotEmpty()
+                                )
+
+                                    <div
+                                        style="
+                                            display:flex;
+                                            flex-wrap:wrap;
+                                            gap:6px;
+                                        "
+                                    >
+
+                                        @foreach(
+                                            $request->jenisPermintaan
+                                            as $jenis
+                                        )
+
+                                            <span
+                                                style="
+                                                    display:inline-block;
+                                                    background:#ede9fe;
+                                                    color:#6d28d9;
+                                                    padding:5px 9px;
+                                                    border-radius:999px;
+                                                    font-size:12px;
+                                                    font-weight:600;
+                                                    white-space:nowrap;
+                                                "
+                                            >
+                                                {{ $jenis->name }}
+                                            </span>
+
+                                        @endforeach
+
+                                    </div>
+
+                                @else
+
+                                    <span
+                                        style="
+                                            color:#9ca3af;
+                                        "
+                                    >
+                                        -
+
+                                    </span>
+
+                                @endif
+
+                            </td>
+
+
+                            {{-- PERMINTAAN --}}
+
                             <td
                                 style="
                                     padding:12px;
@@ -299,6 +493,8 @@
 
                             </td>
 
+
+                            {{-- STATUS --}}
 
                             <td
                                 style="
@@ -348,6 +544,8 @@
                             </td>
 
 
+                            {{-- TANGGAL --}}
+
                             <td
                                 style="
                                     padding:12px;
@@ -373,14 +571,25 @@
                         <tr>
 
                             <td
-                                colspan="7"
+                                colspan="8"
                                 style="
                                     padding:40px;
                                     text-align:center;
                                     color:#6b7280;
                                 "
                             >
-                                Tidak ada data permintaan IT.
+
+                                @if(filled($jenisFilter))
+
+                                    Tidak ada data permintaan IT
+                                    untuk jenis yang dipilih.
+
+                                @else
+
+                                    Tidak ada data permintaan IT.
+
+                                @endif
+
                             </td>
 
                         </tr>

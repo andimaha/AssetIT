@@ -9,7 +9,7 @@ use Filament\Widgets\ChartWidget;
 
 class ItRequestTypeChart extends ChartWidget
 {
-    protected ?string $heading = 'Permintaan IT Berdasarkan Jenis';
+    protected ?string $heading = 'Permintaan IT';
 
     /*
     |--------------------------------------------------------------------------
@@ -28,16 +28,6 @@ class ItRequestTypeChart extends ChartWidget
 
     public ?string $filter = null;
 
-    /*
-    |--------------------------------------------------------------------------
-    | JENIS MAPPING
-    |--------------------------------------------------------------------------
-    |
-    | Mapping nama jenis yang berasal dari mstjenispermintaan.
-    |
-    */
-
-    public array $jenisMapping = [];
 
     /*
     |--------------------------------------------------------------------------
@@ -64,6 +54,7 @@ class ItRequestTypeChart extends ChartWidget
             ->map(fn ($year) => (int) $year)
             ->toArray();
 
+
         /*
         |--------------------------------------------------------------------------
         | PASTIKAN TAHUN SEKARANG SELALU ADA
@@ -73,6 +64,7 @@ class ItRequestTypeChart extends ChartWidget
         if (! in_array($currentYear, $years, true)) {
             array_unshift($years, $currentYear);
         }
+
 
         /*
         |--------------------------------------------------------------------------
@@ -85,6 +77,7 @@ class ItRequestTypeChart extends ChartWidget
             ->sortDesc()
             ->values()
             ->toArray();
+
 
         /*
         |--------------------------------------------------------------------------
@@ -134,9 +127,7 @@ class ItRequestTypeChart extends ChartWidget
                     $year
                     . ' — '
                     . $monthName;
-
             }
-
         }
 
         return $filters;
@@ -169,12 +160,7 @@ class ItRequestTypeChart extends ChartWidget
         |--------------------------------------------------------------------------
         */
 
-        if (
-            str_contains(
-                $filter,
-                '-'
-            )
-        ) {
+        if (str_contains($filter, '-')) {
 
             [$year, $month] =
                 array_map(
@@ -191,7 +177,6 @@ class ItRequestTypeChart extends ChartWidget
                 (int) $filter;
 
             $month = null;
-
         }
 
 
@@ -202,7 +187,6 @@ class ItRequestTypeChart extends ChartWidget
         */
 
         $query = ItRequest::query()
-            ->with('jenisPermintaan')
             ->whereYear(
                 'created_at',
                 $year
@@ -221,13 +205,12 @@ class ItRequestTypeChart extends ChartWidget
                 'created_at',
                 $month
             );
-
         }
 
 
         /*
         |--------------------------------------------------------------------------
-        | AMBIL REQUEST
+        | AMBIL DATA
         |--------------------------------------------------------------------------
         */
 
@@ -237,46 +220,6 @@ class ItRequestTypeChart extends ChartWidget
                 'asc'
             )
             ->get();
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | JENIS
-        |--------------------------------------------------------------------------
-        |
-        | Ambil seluruh jenis yang digunakan oleh request
-        | dalam periode filter.
-        |
-        */
-
-        $jenisNames = $requests
-            ->flatMap(
-                fn ($request) =>
-                    $request
-                        ->jenisPermintaan
-                        ->pluck('name')
-            )
-            ->filter()
-            ->unique()
-            ->values();
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | FALLBACK JIKA TIDAK ADA DATA
-        |--------------------------------------------------------------------------
-        */
-
-        if ($jenisNames->isEmpty()) {
-
-            $jenisNames = collect([
-                'Hardware',
-                'Software',
-                'Data',
-                'Lain-lain',
-            ]);
-
-        }
 
 
         /*
@@ -307,200 +250,71 @@ class ItRequestTypeChart extends ChartWidget
                         $i,
                         1
                     )->translatedFormat('F');
-
             }
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | DATA
+        |--------------------------------------------------------------------------
+        |
+        | Sekarang hanya ada SATU dataset.
+        |
+        | Tidak ada lagi pembagian berdasarkan jenisPermintaan.
+        |
+        */
+
+        $data = [];
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | BULAN TERPILIH
+        |--------------------------------------------------------------------------
+        */
+
+        if ($month !== null) {
+
+            $data[] =
+                $requests->count();
 
         }
 
 
         /*
         |--------------------------------------------------------------------------
-        | DATASET
+        | SEMUA BULAN
         |--------------------------------------------------------------------------
         */
 
-        $datasets = [];
+        else {
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | WARNA
-        |--------------------------------------------------------------------------
-        */
-
-        $colors = [
-
-            '#3B82F6', // Blue
-            '#10B981', // Green
-            '#F59E0B', // Amber
-            '#EF4444', // Red
-            '#8B5CF6', // Violet
-            '#06B6D4', // Cyan
-            '#F97316', // Orange
-            '#EC4899', // Pink
-            '#14B8A6', // Teal
-            '#6366F1', // Indigo
-            '#84CC16', // Lime
-            '#A855F7', // Purple
-
-        ];
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | LOOP JENIS
-        |--------------------------------------------------------------------------
-        */
-
-        foreach (
-            $jenisNames as $jenisIndex => $jenis
-        ) {
-
-            $data = [];
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | BULAN TERPILIH
-            |--------------------------------------------------------------------------
-            */
-
-            if ($month !== null) {
+            for (
+                $currentMonth = 1;
+                $currentMonth <= 12;
+                $currentMonth++
+            ) {
 
                 $total = $requests
                     ->filter(
                         function ($request) use (
-                            $jenis
+                            $currentMonth
                         ) {
 
                             return
-                                $request
-                                    ->jenisPermintaan
-                                    ->contains(
-                                        'name',
-                                        $jenis
-                                    );
-
+                                Carbon::parse(
+                                    $request->created_at
+                                )->month
+                                ===
+                                $currentMonth;
                         }
                     )
                     ->count();
 
-
                 $data[] = $total;
-
             }
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | SEMUA BULAN
-            |--------------------------------------------------------------------------
-            */
-
-            else {
-
-                for (
-                    $currentMonth = 1;
-                    $currentMonth <= 12;
-                    $currentMonth++
-                ) {
-
-                    $total = $requests
-                        ->filter(
-                            function ($request) use (
-                                $currentMonth,
-                                $jenis
-                            ) {
-
-                                if (
-                                    Carbon::parse(
-                                        $request->created_at
-                                    )->month
-                                    !==
-                                    $currentMonth
-                                ) {
-
-                                    return false;
-
-                                }
-
-                                return
-                                    $request
-                                        ->jenisPermintaan
-                                        ->contains(
-                                            'name',
-                                            $jenis
-                                        );
-
-                            }
-                        )
-                        ->count();
-
-
-                    $data[] = $total;
-
-                }
-
-            }
-
-
-            $color =
-                $colors[
-                    $jenisIndex
-                    %
-                    count($colors)
-                ];
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | DATASET
-            |--------------------------------------------------------------------------
-            */
-
-            $datasets[] = [
-
-                'label' =>
-                    $jenis,
-
-                'data' =>
-                    $data,
-
-                'backgroundColor' =>
-                    $color,
-
-                'borderColor' =>
-                    $color,
-
-                'borderWidth' =>
-                    1,
-
-                'borderRadius' =>
-                    4,
-
-                'borderSkipped' =>
-                    false,
-
-            ];
-
         }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | MAPPING UNTUK CLICK
-        |--------------------------------------------------------------------------
-        */
-
-        $this->jenisMapping =
-            $jenisNames
-                ->values()
-                ->mapWithKeys(
-                    fn ($jenis, $index) => [
-                        $jenis => $jenis,
-                    ]
-                )
-                ->toArray();
 
 
         /*
@@ -511,14 +325,39 @@ class ItRequestTypeChart extends ChartWidget
 
         return [
 
-            'datasets' =>
-                $datasets,
+            'datasets' => [
+
+                [
+
+                    'label' =>
+                        'Total Request',
+
+                    'data' =>
+                        $data,
+
+                    'backgroundColor' =>
+                        '#8B5CF6',
+
+                    'borderColor' =>
+                        '#7C3AED',
+
+                    'borderWidth' =>
+                        1,
+
+                    'borderRadius' =>
+                        6,
+
+                    'borderSkipped' =>
+                        false,
+
+                ],
+
+            ],
 
             'labels' =>
                 $labels,
 
         ];
-
     }
 
 
@@ -557,12 +396,7 @@ class ItRequestTypeChart extends ChartWidget
     plugins: {
 
         legend: {
-            position: 'bottom',
-
-            labels: {
-                usePointStyle: true,
-                padding: 15
-            }
+            display: false
         },
 
         tooltip: {
@@ -572,15 +406,11 @@ class ItRequestTypeChart extends ChartWidget
                 label: function(context)
                 {
 
-                    const label =
-                        context.dataset.label
-                        || '';
-
                     const value =
                         context.parsed.y
                         || 0;
 
-                    return label + ': ' + value + ' Request';
+                    return value + ' Request';
 
                 }
 
@@ -594,7 +424,7 @@ class ItRequestTypeChart extends ChartWidget
 
         x: {
 
-            stacked: true,
+            stacked: false,
 
             title: {
                 display: true,
@@ -609,7 +439,7 @@ class ItRequestTypeChart extends ChartWidget
 
         y: {
 
-            stacked: true,
+            stacked: false,
 
             beginAtZero: true,
 
@@ -640,19 +470,8 @@ class ItRequestTypeChart extends ChartWidget
             elements[0];
 
 
-        const datasetIndex =
-            element.datasetIndex;
-
-
         const index =
             element.index;
-
-
-        const jenis =
-            chart
-                .data
-                .datasets[datasetIndex]
-                .label;
 
 
         const bulan =
@@ -668,7 +487,6 @@ class ItRequestTypeChart extends ChartWidget
         console.log(
             'IT REQUEST CLICK:',
             {
-                jenis: jenis,
                 bulan: bulan,
                 filter: filter
             }
@@ -678,7 +496,6 @@ class ItRequestTypeChart extends ChartWidget
         Livewire.dispatch(
             'open-it-request-detail-modal',
             {
-                jenis: jenis,
                 bulan: bulan,
                 filter: filter
             }
