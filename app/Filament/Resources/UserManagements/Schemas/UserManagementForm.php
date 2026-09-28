@@ -43,15 +43,6 @@ class UserManagementForm
                     |--------------------------------------------------------------------------
                     | NIK KARYAWAN
                     |--------------------------------------------------------------------------
-                    |
-                    | NIK dipilih dari Master Karyawan.
-                    |
-                    | Setelah NIK dipilih:
-                    |
-                    | 1. Nama user otomatis mengikuti Master Karyawan.
-                    | 2. Kepala Bagian ditampilkan berdasarkan
-                    |    mstkaryawan.NIKKepalaBagian.
-                    |
                     */
 
                     Select::make(
@@ -118,15 +109,6 @@ class UserManagementForm
                                 if (
                                     $karyawan
                                 ) {
-
-                                    /*
-                                    |--------------------------------------------------------------------------
-                                    | NAMA
-                                    |--------------------------------------------------------------------------
-                                    |
-                                    | Nama User mengikuti nama di Master Karyawan.
-                                    |
-                                    */
 
                                     $set(
                                         'name',
@@ -240,24 +222,6 @@ class UserManagementForm
             |--------------------------------------------------------------------------
             | KEPALA BAGIAN
             |--------------------------------------------------------------------------
-            |
-            | READONLY.
-            |
-            | Kepala Bagian TIDAK dikelola dari User Management.
-            |
-            | Sumber data:
-            |
-            | users.NIK
-            |     ↓
-            | mstkaryawan.NIK
-            |     ↓
-            | mstkaryawan.NIKKepalaBagian
-            |     ↓
-            | mstkaryawan.NIK
-            |
-            | Jadi perubahan Kepala Bagian harus dilakukan melalui
-            | Master Karyawan.
-            |
             */
 
             Section::make(
@@ -274,37 +238,12 @@ class UserManagementForm
                         ->label(
                             'Kepala Bagian'
                         )
-
-                        /*
-                        |--------------------------------------------------------------------------
-                        | READONLY
-                        |--------------------------------------------------------------------------
-                        */
-
                         ->readOnly()
-
-                        /*
-                        |--------------------------------------------------------------------------
-                        | DEFAULT / DISPLAY
-                        |--------------------------------------------------------------------------
-                        |
-                        | Nilai akan diisi dari:
-                        |
-                        | mstkaryawan.NIKKepalaBagian
-                        |
-                        */
-
                         ->formatStateUsing(
                             function (
                                 $state,
                                 $record
                             ): string {
-
-                                /*
-                                |--------------------------------------------------------------------------
-                                | AMBIL NIK KARYAWAN
-                                |--------------------------------------------------------------------------
-                                */
 
                                 $nik =
                                     $record?->NIK
@@ -316,13 +255,6 @@ class UserManagementForm
 
                                     return '-';
                                 }
-
-
-                                /*
-                                |--------------------------------------------------------------------------
-                                | AMBIL MASTER KARYAWAN
-                                |--------------------------------------------------------------------------
-                                */
 
                                 $karyawan =
                                     MstKaryawan::query()
@@ -343,13 +275,6 @@ class UserManagementForm
                                     return '-';
                                 }
 
-
-                                /*
-                                |--------------------------------------------------------------------------
-                                | KEPALA BAGIAN
-                                |--------------------------------------------------------------------------
-                                */
-
                                 $kepalaBagian =
                                     $karyawan
                                         ->kepalaBagian;
@@ -361,25 +286,11 @@ class UserManagementForm
                                     return 'Tidak ada Kepala Bagian';
                                 }
 
-
-                                /*
-                                |--------------------------------------------------------------------------
-                                | DEPARTEMEN
-                                |--------------------------------------------------------------------------
-                                */
-
                                 $departemen =
                                     $kepalaBagian
                                         ->departemen
                                         ?->NamaDept
                                     ?? '-';
-
-
-                                /*
-                                |--------------------------------------------------------------------------
-                                | FORMAT
-                                |--------------------------------------------------------------------------
-                                */
 
                                 return
                                     $kepalaBagian->NIK
@@ -393,15 +304,12 @@ class UserManagementForm
 
                             }
                         )
-
                         ->helperText(
                             'Kepala Bagian ditentukan dari kolom NIKKepalaBagian pada Master Karyawan. Untuk mengubahnya, edit data karyawan pada Master Karyawan.'
                         )
-
                         ->dehydrated(
                             false
                         )
-
                         ->columnSpanFull(),
 
                 ])
@@ -503,24 +411,23 @@ class UserManagementForm
                     */
 
                     Section::make(
-    'Transaksi'
-)
-    ->description(
-        'Hak akses untuk menjalankan dan mengelola transaksi sistem.'
-    )
-    ->schema([
+                        'Transaksi'
+                    )
+                        ->description(
+                            'Hak akses untuk menjalankan dan mengelola transaksi sistem.'
+                        )
+                        ->schema([
 
-        self::permissionList(
-            'trx'
-        ),
+                            self::permissionList(
+                                'trx'
+                            ),
 
-        self::permissionList(
-            'itrequest'
-        ),
+                            self::permissionList(
+                                'itrequest'
+                            ),
 
-    ])
-    ->columnSpanFull(),
-
+                        ])
+                        ->columnSpanFull(),
 
                 ])
                 ->columnSpanFull(),
@@ -534,6 +441,22 @@ class UserManagementForm
     |--------------------------------------------------------------------------
     | PERMISSION LIST
     |--------------------------------------------------------------------------
+    |
+    | PENTING:
+    |
+    | Nama state dibuat:
+    |
+    | permissions_mst
+    | permissions_trx
+    | permissions_itrequest
+    |
+    | State tersebut kemudian diisi oleh:
+    |
+    | EditUserManagement::mutateFormDataBeforeFill()
+    |
+    | Jadi ketika halaman Edit dibuka, permission yang tersimpan
+    | akan otomatis dicentang kembali.
+    |
     */
 
     protected static function permissionList(
@@ -547,6 +470,22 @@ class UserManagementForm
             ->label(
                 false
             )
+
+            /*
+            |--------------------------------------------------------------------------
+            | OPTIONS
+            |--------------------------------------------------------------------------
+            |
+            | Gunakan nama permission sebagai VALUE.
+            |
+            | Contoh:
+            |
+            | mstuser.view
+            | mstuser.create
+            | mstuser.update
+            | mstuser.delete
+            |
+            */
 
             ->options(
                 fn (): array =>
@@ -655,6 +594,11 @@ class UserManagementForm
                                             ''
                                         )
 
+                                        ->replaceFirst(
+                                            'itrequest',
+                                            'IT Request'
+                                        )
+
                                         ->replace(
                                             [
                                                 '_',
@@ -719,6 +663,24 @@ class UserManagementForm
                         )
                         ->toArray()
             )
+
+            /*
+            |--------------------------------------------------------------------------
+            | STATE
+            |--------------------------------------------------------------------------
+            |
+            | Jangan gunakan relationship() di sini.
+            |
+            | CheckboxList membaca state dari:
+            |
+            | permissions_mst
+            | permissions_trx
+            | permissions_itrequest
+            |
+            | State tersebut sudah disediakan oleh
+            | mutateFormDataBeforeFill().
+            |
+            */
 
             ->columns(
                 4

@@ -135,14 +135,11 @@ class EditUserManagement extends EditRecord
 
         $this->oldRole =
             $this->record
-
                 ->roles()
-
                 ->where(
                     'guard_name',
                     'web'
                 )
-
                 ->value(
                     'name'
                 );
@@ -157,19 +154,18 @@ class EditUserManagement extends EditRecord
         |--------------------------------------------------------------------------
         | DIRECT PERMISSIONS
         |--------------------------------------------------------------------------
+        |
+        | Ambil permission yang benar-benar dimiliki langsung oleh user.
+        |
         */
 
         $this->oldPermissions =
             $this->record
-
                 ->getDirectPermissions()
-
                 ->pluck('name')
-
-                ->sort()
-
+                ->filter()
+                ->unique()
                 ->values()
-
                 ->toArray();
 
 
@@ -183,7 +179,6 @@ class EditUserManagement extends EditRecord
             collect(
                 $this->oldPermissions
             )
-
                 ->filter(
                     fn (string $permission): bool =>
                         str_starts_with(
@@ -191,9 +186,7 @@ class EditUserManagement extends EditRecord
                             'mst'
                         )
                 )
-
                 ->values()
-
                 ->toArray();
 
 
@@ -207,7 +200,6 @@ class EditUserManagement extends EditRecord
             collect(
                 $this->oldPermissions
             )
-
                 ->filter(
                     fn (string $permission): bool =>
                         str_starts_with(
@@ -215,9 +207,37 @@ class EditUserManagement extends EditRecord
                             'trx'
                         )
                 )
-
                 ->values()
+                ->toArray();
 
+
+        /*
+        |--------------------------------------------------------------------------
+        | IT REQUEST PERMISSIONS
+        |--------------------------------------------------------------------------
+        |
+        | FIX:
+        |
+        | Sebelumnya permissions_itrequest tidak diisi kembali
+        | ketika halaman Edit dibuka.
+        |
+        | Akibatnya permission sebenarnya sudah tersimpan di database,
+        | tetapi checkbox terlihat tidak tercentang.
+        |
+        */
+
+        $data['permissions_itrequest'] =
+            collect(
+                $this->oldPermissions
+            )
+                ->filter(
+                    fn (string $permission): bool =>
+                        str_starts_with(
+                            $permission,
+                            'itrequest'
+                        )
+                )
+                ->values()
                 ->toArray();
 
 
@@ -273,6 +293,13 @@ class EditUserManagement extends EditRecord
         |--------------------------------------------------------------------------
         | PERMISSIONS
         |--------------------------------------------------------------------------
+        |
+        | Gabungkan seluruh permission dari form.
+        |
+        | 1. Master Data
+        | 2. Transaction
+        | 3. IT Request
+        |
         */
 
         $permissions = collect([
@@ -286,10 +313,11 @@ class EditUserManagement extends EditRecord
                 $data['permissions_trx']
                 ?? []
             ),
+
             ...(
-        $data['permissions_itrequest']
-        ?? []
-    ),
+                $data['permissions_itrequest']
+                ?? []
+            ),
 
         ]);
 
@@ -404,16 +432,13 @@ class EditUserManagement extends EditRecord
                     ) {
 
                         return Permission::query()
-
                             ->where(
                                 'guard_name',
                                 'web'
                             )
-
                             ->whereKey(
                                 $permission
                             )
-
                             ->value(
                                 'name'
                             );
@@ -487,7 +512,6 @@ class EditUserManagement extends EditRecord
             collect(
                 $this->selectedRole
             )
-
                 ->first();
 
 
@@ -638,13 +662,10 @@ class EditUserManagement extends EditRecord
 
         $added =
             $newPermissions
-
                 ->diff(
                     $oldPermissions
                 )
-
                 ->values()
-
                 ->toArray();
 
 
@@ -656,13 +677,10 @@ class EditUserManagement extends EditRecord
 
         $removed =
             $oldPermissions
-
                 ->diff(
                     $newPermissions
                 )
-
                 ->values()
-
                 ->toArray();
 
 
