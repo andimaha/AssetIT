@@ -25,6 +25,20 @@ class TrxIspDowntimesTable
             ->recordTitleAttribute('NoTiket')
 
             ->columns([
+                /*
+                 * Perusahaan
+                 *
+                 * Relasi:
+                 * TrxIspDowntime
+                 *      -> isp
+                 *          -> perusahaan
+                 */
+                TextColumn::make(
+                    'isp.perusahaan.NamaPerusahaan'
+                )
+                    ->label('Perusahaan')
+                    ->searchable()
+                    ->sortable(),
 
                 /*
                  * Vendor
@@ -66,20 +80,7 @@ class TrxIspDowntimesTable
                     ->searchable()
                     ->sortable(),
 
-                /*
-                 * Perusahaan
-                 *
-                 * Relasi:
-                 * TrxIspDowntime
-                 *      -> isp
-                 *          -> perusahaan
-                 */
-                TextColumn::make(
-                    'isp.perusahaan.NamaPerusahaan'
-                )
-                    ->label('Perusahaan')
-                    ->searchable()
-                    ->sortable(),
+                
 
                 /*
                  * Lokasi

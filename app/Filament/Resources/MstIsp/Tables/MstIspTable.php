@@ -21,6 +21,11 @@ class MstIspTable
         return $table
 
             ->columns([
+                
+                TextColumn::make('perusahaan.NamaPerusahaan')
+                    ->label('Perusahaan')
+                    ->searchable()
+                    ->sortable(),
 
                 TextColumn::make('ISPCode')
                     ->label('Kode ISP')
@@ -59,10 +64,6 @@ class MstIspTable
                     ->searchable()
                     ->sortable(),
 
-                TextColumn::make('perusahaan.NamaPerusahaan')
-                    ->label('Perusahaan')
-                    ->searchable()
-                    ->sortable(),
 
                 TextColumn::make('lokasi.NamaLokasi')
                     ->label('Lokasi')

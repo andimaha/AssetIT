@@ -20,6 +20,16 @@ class TrxIspBandwidthsTable
             ->recordTitleAttribute('TanggalUpgrade')
 
             ->columns([
+                
+                /*
+                 * Perusahaan
+                 * Relasi:
+                 * TrxIspBandwidth -> isp -> perusahaan
+                 */
+                TextColumn::make('isp.perusahaan.NamaPerusahaan')
+                    ->label('Perusahaan')
+                    ->searchable()
+                    ->sortable(),
 
                 /*
                  * Vendor
@@ -55,15 +65,6 @@ class TrxIspBandwidthsTable
                     ->searchable()
                     ->sortable(),
 
-                /*
-                 * Perusahaan
-                 * Relasi:
-                 * TrxIspBandwidth -> isp -> perusahaan
-                 */
-                TextColumn::make('isp.perusahaan.NamaPerusahaan')
-                    ->label('Perusahaan')
-                    ->searchable()
-                    ->sortable(),
 
                 /*
                  * Lokasi
