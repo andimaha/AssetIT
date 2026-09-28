@@ -83,7 +83,7 @@ class ItRequestController extends Controller
 
         $requests = $query
             ->latest('IDRequest')
-            ->paginate(15)
+            ->paginate(10)
             ->withQueryString();
 
         return view(
