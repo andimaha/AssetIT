@@ -1369,3 +1369,163 @@ npm run build
 ---
 
  # End of Guide
+
+---
+
+# Tambahan
+
+ ## Quick Installation — Terminal
+
+ ### 1\. Clone project
+
+```
+git clone https://github.com/jamesalejandros/MatapelProject2.git
+cd MatapelProject2
+```
+
+ ### 2\. Install dependency
+
+```
+composer install
+npm install
+```
+
+ ### 3\. Buat `.env`
+
+ **Windows:**
+
+```
+copy .env.example .env
+```
+
+ **Linux/Mac:**
+
+```
+cp .env.example .env
+```
+
+ ### 4\. Generate application key
+
+```
+php artisan key:generate
+```
+
+ ### 5\. Buat database
+
+ Jalankan di MySQL:
+
+```
+CREATE DATABASE matapel_asset;
+```
+
+ Kemudian pastikan `.env` berisi:
+
+```
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=matapel_asset
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+ ### 6\. Jalankan migration
+
+```
+php artisan migrate
+```
+
+ ### 7\. Jalankan **dua seeder yang spesifik**
+
+```
+php artisan db:seed --class=UserSeeder
+php artisan db:seed --class=RolePermissionSeeder
+```
+
+ > Jadi **tidak perlu** menjalankan `php artisan db:seed` untuk instalasi ini jika yang memang dibutuhkan hanya `UserSeeder` dan `RolePermissionSeeder`.
+
+ ### 8\. Buat storage link
+
+```
+php artisan storage:link
+```
+
+ ### 9\. Clear cache
+
+```
+php artisan optimize:clear
+php artisan filament:cache-components
+```
+
+ ### 10\. Build frontend
+
+```
+npm run build
+```
+
+ ### 11\. Jalankan Laravel
+
+```
+php artisan serve
+```
+
+ Buka:
+
+```
+http://127.0.0.1:8000/login
+```
+
+---
+
+ ## Kalau Development
+
+ Gunakan **2 terminal**.
+
+ **Terminal 1:**
+
+```
+php artisan serve
+```
+
+ **Terminal 2:**
+
+```
+npm run dev
+```
+
+ ### Urutan lengkap copy-paste
+
+```
+git clone https://github.com/jamesalejandros/MatapelProject2.git
+cd MatapelProject2
+
+composer install
+npm install
+
+copy .env.example .env
+
+php artisan key:generate
+
+php artisan migrate
+
+php artisan db:seed --class=UserSeeder
+php artisan db:seed --class=RolePermissionSeeder
+
+php artisan storage:link
+
+php artisan optimize:clear
+php artisan filament:cache-components
+
+npm run build
+
+php artisan serve
+```
+
+ **Catatan:** perintah `copy` di atas untuk Windows. Kalau Linux/Mac, ganti dengan:
+
+```
+cp .env.example .env
+```
+
+ Dan **jangan menjalankan `php artisan migrate:fresh`** pada database yang sudah berisi data.
+
