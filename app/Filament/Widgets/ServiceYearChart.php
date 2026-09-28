@@ -54,13 +54,14 @@ class ServiceYearChart extends ChartWidget
                         'IDPerusahaan',
                         $this->filter
                     );
+
                 }
             );
         }
 
         /*
         |--------------------------------------------------------------------------
-        | Ambil data berdasarkan Tahun + Jenis Service
+        | DATA TAHUN + JENIS SERVICE
         |--------------------------------------------------------------------------
         */
 
@@ -84,7 +85,7 @@ class ServiceYearChart extends ChartWidget
 
         /*
         |--------------------------------------------------------------------------
-        | Daftar Tahun
+        | DAFTAR TAHUN
         |--------------------------------------------------------------------------
         */
 
@@ -101,7 +102,7 @@ class ServiceYearChart extends ChartWidget
 
         /*
         |--------------------------------------------------------------------------
-        | Daftar Jenis Service
+        | DAFTAR JENIS SERVICE
         |--------------------------------------------------------------------------
         */
 
@@ -118,11 +119,12 @@ class ServiceYearChart extends ChartWidget
 
         /*
         |--------------------------------------------------------------------------
-        | Warna Setiap Jenis Service
+        | WARNA
         |--------------------------------------------------------------------------
         */
 
         $colors = [
+
             '#3B82F6', // Biru
             '#10B981', // Hijau
             '#F59E0B', // Kuning
@@ -135,83 +137,156 @@ class ServiceYearChart extends ChartWidget
             '#6366F1', // Indigo
             '#14B8A6', // Teal
             '#A855F7', // Violet
+
         ];
 
 
         /*
         |--------------------------------------------------------------------------
-        | Buat Dataset Stack Berdasarkan Jenis
+        | DATASET STACK
         |--------------------------------------------------------------------------
         */
 
         $datasets = [];
 
-        foreach ($jenisServices as $index => $jenis) {
+        foreach (
+            $jenisServices
+            as $index => $jenis
+        ) {
 
             $data = [];
 
-            foreach ($years as $tahun) {
+            foreach (
+                $years
+                as $tahun
+            ) {
 
                 $row = $services
 
                     ->first(
                         fn ($item) =>
-                            (string) $item->tahun === (string) $tahun
+                            (string) $item->tahun
+                                ===
+                            (string) $tahun
                             &&
-                            (string) $item->jenis === (string) $jenis
+                            (string) $item->jenis
+                                ===
+                            (string) $jenis
                     );
 
-                $data[] = $row
+                $data[] =
+                    $row
                     ? (int) $row->total
                     : 0;
             }
 
 
-            $color = $colors[
-                $index % count($colors)
-            ];
+            $color =
+                $colors[
+                    $index
+                    %
+                    count($colors)
+                ];
 
 
             $datasets[] = [
 
-                'label' => $jenis,
+                'label' =>
+                    $jenis,
 
-                'data' => $data,
+                'data' =>
+                    $data,
 
-                'backgroundColor' => $color,
+                'backgroundColor' =>
+                    $color,
 
-                'borderColor' => $color,
+                'borderColor' =>
+                    $color,
 
-                'borderWidth' => 1,
+                'borderWidth' =>
+                    1,
 
-                'borderRadius' => 4,
+                'borderRadius' =>
+                    4,
 
-                'stack' => 'service',
+                'stack' =>
+                    'service',
 
             ];
         }
 
 
+        /*
+        |--------------------------------------------------------------------------
+        | TOTAL PER TAHUN
+        |--------------------------------------------------------------------------
+        |
+        | Total ini BUKAN dataset.
+        |
+        | Jadi tidak akan membuat garis / warna / legend tambahan.
+        |
+        */
+
+        $totalPerYear = [];
+
+        foreach (
+            $years
+            as $tahun
+        ) {
+
+            $totalPerYear[] =
+                (int) $services
+
+                    ->where(
+                        'tahun',
+                        $tahun
+                    )
+
+                    ->sum(
+                        'total'
+                    );
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | RETURN DATA
+        |--------------------------------------------------------------------------
+        */
+
         return [
 
-            'datasets' => $datasets,
+            'datasets' =>
+                $datasets,
 
-            'labels' => $years
+            'labels' =>
+                $years
 
-                ->map(
-                    fn ($tahun) =>
-                        (string) $tahun
-                )
+                    ->map(
+                        fn ($tahun) =>
+                            (string) $tahun
+                    )
 
-                ->toArray(),
+                    ->toArray(),
+
+            /*
+            |--------------------------------------------------------------------------
+            | TOTAL DIKIRIM KE JAVASCRIPT
+            |--------------------------------------------------------------------------
+            */
+
+            'totals' =>
+                $totalPerYear,
 
         ];
     }
+
 
     protected function getType(): string
     {
         return 'bar';
     }
+
 
     protected function getOptions(): RawJs
     {
@@ -221,11 +296,85 @@ class ServiceYearChart extends ChartWidget
 
 responsive:true,
 
+maintainAspectRatio:false,
+
+layout:{
+
+    padding:{
+
+        top:30
+
+    }
+
+},
+
 plugins:{
 
     legend:{
+
         display:true,
+
         position:'bottom'
+
+    },
+
+    tooltip:{
+
+        callbacks:{
+
+            label:function(context)
+            {
+
+                let label =
+                    context.dataset.label || '';
+
+                let value =
+                    context.parsed.y ?? 0;
+
+                return (
+                    label
+                    +
+                    ': '
+                    +
+                    value
+                );
+
+            },
+
+            footer:function(tooltipItems)
+            {
+
+                if(
+                    !tooltipItems.length
+                ) {
+                    return '';
+                }
+
+                let chart =
+                    tooltipItems[0].chart;
+
+                let index =
+                    tooltipItems[0].dataIndex;
+
+                let total =
+                    chart.data.totals[index] ?? 0;
+
+                return (
+                    'Total Tahun: '
+                    +
+                    total
+                );
+
+            }
+
+        },
+
+        footerFont:{
+
+            weight:'bold'
+
+        }
+
     }
 
 },
@@ -244,6 +393,8 @@ scales:{
 
         beginAtZero:true,
 
+        grace:'10%',
+
         ticks:{
 
             precision:0
@@ -254,33 +405,262 @@ scales:{
 
 },
 
+/*
+|--------------------------------------------------------------------------
+| CUSTOM DRAW TOTAL LABEL
+|--------------------------------------------------------------------------
+|
+| Ini bukan line chart.
+|
+| Kita mengambil posisi bagian PALING ATAS dari stacked bar
+| kemudian menggambar angka total tepat di atasnya.
+|
+*/
+
+animation:{
+
+    onComplete:function(animation)
+    {
+
+        const chart =
+            animation.chart;
+
+        const ctx =
+            chart.ctx;
+
+        const totals =
+            chart.data.totals || [];
+
+        const labels =
+            chart.data.labels || [];
+
+
+        ctx.save();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | FONT TOTAL
+        |--------------------------------------------------------------------------
+        */
+
+        ctx.font =
+            'bold 14px Arial';
+
+        ctx.fillStyle =
+            '#111827';
+
+        ctx.textAlign =
+            'center';
+
+        ctx.textBaseline =
+            'bottom';
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | LOOP SETIAP TAHUN
+        |--------------------------------------------------------------------------
+        */
+
+        labels.forEach(
+            function(label, index)
+            {
+
+                let total =
+                    totals[index] ?? 0;
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | Jangan tampilkan jika total 0
+                |--------------------------------------------------------------------------
+                */
+
+                if(total <= 0)
+                {
+                    return;
+                }
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | Posisi X BAR
+                |--------------------------------------------------------------------------
+                |
+                | Ambil posisi dari dataset pertama.
+                |
+                */
+
+                let firstMeta =
+                    chart.getDatasetMeta(0);
+
+
+                if(
+                    !firstMeta
+                    ||
+                    !firstMeta.data[index]
+                ) {
+                    return;
+                }
+
+
+                let x =
+                    firstMeta
+                        .data[index]
+                        .x;
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | Cari posisi TOP dari seluruh STACK
+                |--------------------------------------------------------------------------
+                */
+
+                let topY =
+                    Infinity;
+
+
+                chart.data.datasets.forEach(
+                    function(dataset, datasetIndex)
+                    {
+
+                        let meta =
+                            chart.getDatasetMeta(
+                                datasetIndex
+                            );
+
+
+                        if(
+                            !meta
+                            ||
+                            !meta.data[index]
+                        ) {
+                            return;
+                        }
+
+
+                        let bar =
+                            meta.data[index];
+
+
+                        /*
+                        |--------------------------------------------------------------------------
+                        | Hanya dataset yang mempunyai nilai
+                        |--------------------------------------------------------------------------
+                        */
+
+                        let value =
+                            Number(
+                                dataset.data[index]
+                            ) || 0;
+
+
+                        if(
+                            value <= 0
+                        ) {
+                            return;
+                        }
+
+
+                        /*
+                        |--------------------------------------------------------------------------
+                        | Ambil posisi paling atas
+                        |--------------------------------------------------------------------------
+                        */
+
+                        if(
+                            bar.y < topY
+                        ) {
+                            topY =
+                                bar.y;
+                        }
+
+                    }
+                );
+
+
+                if(
+                    topY === Infinity
+                ) {
+                    return;
+                }
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | JARAK LABEL DARI BAR
+                |--------------------------------------------------------------------------
+                */
+
+                let y =
+                    topY - 7;
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | GAMBAR TOTAL
+                |--------------------------------------------------------------------------
+                */
+
+                ctx.fillText(
+                    total.toString(),
+                    x,
+                    y
+                );
+
+            }
+        );
+
+
+        ctx.restore();
+
+    }
+
+},
+
 onClick(event,elements,chart)
 {
 
-    if(!elements.length)
-    {
+    if(
+        !elements.length
+    ) {
         return;
     }
 
 
-    let element = elements[0];
-
-    let index = element.index;
-
-    let datasetIndex = element.datasetIndex;
+    let element =
+        elements[0];
 
 
-    let tahun = chart.data.labels[index];
+    let index =
+        element.index;
 
-    let jenis = chart.data.datasets[datasetIndex].label;
+
+    let datasetIndex =
+        element.datasetIndex;
+
+
+    let tahun =
+        chart.data.labels[index];
+
+
+    let jenis =
+        chart.data.datasets[
+            datasetIndex
+        ].label;
 
 
     Livewire.dispatch(
         'open-service-year-modal',
         {
+
             tahun:tahun,
+
             company:$wire.filter,
+
             jenis:jenis
+
         }
     );
 
