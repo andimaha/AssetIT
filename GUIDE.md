@@ -1,620 +1,952 @@
-Matapel IT Asset Management
-Installation Guide
+# Matapel IT Asset Management
+# Installation Guide
 
-Dokumen ini berisi langkah-langkah untuk menjalankan project Matapel IT Asset Management pada komputer baru.
+Dokumen ini berisi langkah-langkah untuk menjalankan project **Matapel IT Asset Management** pada komputer baru.
 
-Project ini dibangun menggunakan Laravel, Filament, Livewire, Tailwind CSS, Vite, MySQL, dan Spatie Permission.
+Project ini dibangun menggunakan **Laravel, Filament, Livewire, Tailwind CSS, Vite, MySQL, dan Spatie Permission**.
 
 Panduan ini ditujukan untuk user/developer yang belum memiliki project sebelumnya.
 
-1. Persiapan Awal
+---
 
-Pastikan komputer sudah memiliki software berikut.
+# 1. Persiapan Awal
 
-Required Software
-PHP
+Sebelum menjalankan project, pastikan komputer sudah memiliki beberapa aplikasi berikut.
 
-Minimum:
+## Required Software
 
+### 1. PHP
+
+Versi minimum:
+
+```text
 PHP 8.2+
+````
 
+ Cek instalasi:
 
-Cek:
-
+```
 php -v
+```
 
-Composer
+---
 
-Composer digunakan untuk dependency Laravel.
+ ### 2\. Composer
 
-Cek:
+ Composer digunakan untuk menginstall dependency Laravel.
 
+ Cek:
+
+```
 composer -V
+```
 
+ Jika belum ada, install Composer terlebih dahulu.
 
-Jika belum tersedia, install Composer terlebih dahulu.
+---
 
-Node.js & NPM
+ ### 3\. Node.js & NPM
 
-Digunakan untuk asset frontend dan Vite.
+ Digunakan untuk menjalankan asset frontend dan Vite.
 
-Cek:
+ Cek:
 
+```
 node -v
 npm -v
+```
 
+ Disarankan:
 
-Disarankan menggunakan:
-
+```
 Node.js 18+
+```
 
+---
+
+ ### 4\. Database Server
+
+ Project menggunakan:
+
+```
 MySQL
+```
 
-Project menggunakan:
+ Disarankan menggunakan:
 
-MySQL
+ - Laragon
+- XAMPP
+- MySQL Server
 
+ Pastikan MySQL dalam keadaan running.
 
-MySQL dapat dijalankan menggunakan:
+---
 
-Laragon
+ # 2\. Download Project
 
-XAMPP
+ Clone project dari GitHub:
 
-MySQL Server
-
-Pastikan MySQL sudah running.
-
-2. Download Project
-
-Clone repository:
-
+```
 git clone https://github.com/jamesalejandros/MatapelProject2.git
+```
 
+ Masuk ke folder project:
 
-Masuk ke folder project:
-
+```
 cd MatapelProject2
+```
 
+ Jika project diberikan dalam bentuk ZIP, extract project kemudian buka terminal pada folder project.
 
-Jika project diberikan dalam bentuk ZIP, extract project kemudian buka terminal pada folder project.
+---
 
-3. Install Dependency
+ # 3\. Install Dependency Laravel
 
-Install dependency PHP:
+ Install dependency PHP:
 
+```
 composer install
+```
 
+ Tunggu hingga proses selesai.
 
-Install dependency frontend:
+ Folder:
 
-npm install
-
-
-Folder berikut akan dibuat/tersedia setelah proses instalasi:
-
+```
 vendor/
+```
+
+ akan otomatis dibuat.
+
+---
+
+ # 4\. Install Frontend Dependency
+
+ Install package frontend:
+
+```
+npm install
+```
+
+ Folder:
+
+```
 node_modules/
+```
 
-4. Konfigurasi Environment
+ akan otomatis dibuat.
 
-Copy file environment.
+---
 
-Windows:
+ # 5\. Konfigurasi Environment
 
+ Laravel membutuhkan file konfigurasi `.env`.
+
+ Copy file:
+
+ Windows:
+
+```
 copy .env.example .env
+```
 
+ Linux/Mac:
 
-Linux/Mac:
-
+```
 cp .env.example .env
+```
 
+---
 
-Kemudian generate application key:
+ Generate Laravel Key:
 
+```
 php artisan key:generate
+```
 
-5. Konfigurasi Database
+ Jika berhasil akan muncul:
 
-Buka:
+```
+Application key set successfully.
+```
 
+---
+
+ # 6\. Konfigurasi Database
+
+ Buka file:
+
+```
 .env
+```
 
+ Sesuaikan bagian database:
 
-Sesuaikan konfigurasi database:
-
+```
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
 DB_DATABASE=matapel_asset
 DB_USERNAME=root
 DB_PASSWORD=
+```
 
+ Jika MySQL menggunakan password, isi:
 
-Jika MySQL menggunakan password, isi:
-
+```
 DB_PASSWORD=your_password
+```
 
-6. Membuat Database
+---
 
-Buat database:
+ # 7\. Membuat Database
 
+ Buka salah satu:
+
+ - phpMyAdmin
+- MySQL Workbench
+- MySQL Command Line
+
+ Buat database baru:
+
+```
 CREATE DATABASE matapel_asset;
+```
 
+ Pastikan nama database sama dengan konfigurasi:
 
-Database dapat dibuat melalui:
+```
+DB_DATABASE=matapel_asset
+```
 
-phpMyAdmin
+---
 
-MySQL Workbench
+ # 8\. Database Migration
 
-MySQL Command Line
+ Project menyediakan migration lengkap pada:
 
-7. Database Migration
-
-Project menyediakan migration lengkap pada:
-
+```
 database/migrations/
+```
 
+ Migration mencakup beberapa modul utama:
 
-Migration mencakup antara lain:
+ - Users
+- Assets
+- Departemen
+- Karyawan
+- Perusahaan
+- Lokasi
+- Ruangan
+- Vendor
+- Sambungan
+- Software
+- Software License
+- Software Assignment
+- Mutasi Asset
+- Service Asset
+- Retire Asset
+- CCTV Assignment
+- PABX Assignment
+- ISP
+- ISP Bandwidth
+- ISP Downtime
+- IT Request
+- IT Request Approval
+- Activity Log
+- Permission & Role
+- Media Library
+- Notification
 
-User
+ Untuk database baru, jalankan:
 
-Asset
-
-Departemen
-
-Karyawan
-
-Perusahaan
-
-Lokasi
-
-Ruangan
-
-Vendor
-
-Software
-
-Software License
-
-Software Assignment
-
-Mutasi Asset
-
-Service Asset
-
-Retire Asset
-
-CCTV Assignment
-
-PABX Assignment
-
-ISP
-
-ISP Bandwidth
-
-ISP Downtime
-
-IT Request
-
-IT Request Approval
-
-Activity Log
-
-Permission & Role
-
-Media Library
-
-Notification
-
-Untuk instalasi database baru, migration dapat dijalankan dengan:
-
+```
 php artisan migrate
+```
 
+ Jika ingin menjalankan migration sekaligus seeder:
 
-Jika menggunakan database yang sudah berisi data production/development, jangan menjalankan migrate:fresh.
+```
+php artisan migrate --seed
+```
 
-8. Database Seeder
+ > **Catatan:** Jangan menggunakan `migrate:fresh` pada database yang sudah memiliki data karena command tersebut akan menghapus seluruh tabel dan data.
 
-Project memiliki beberapa seeder penting pada:
+---
 
+ # 9\. Database Seeder
+
+ Project memiliki beberapa seeder penting pada:
+
+```
 database/seeders/
+```
 
+ Seeder utama:
 
-Seeder utama:
-
+```
 DatabaseSeeder.php
 MasterSeeder.php
 RolePermissionSeeder.php
 UserSeeder.php
 AdminUserSeeder.php
 ItRequestPermissionSeeder.php
+```
 
+ Seeder yang paling penting untuk sistem permission dan user adalah:
 
-Seeder permission dan user sangat penting karena sistem menggunakan Spatie Permission.
+```
+RolePermissionSeeder.php
+UserSeeder.php
+```
 
-Untuk menjalankan seluruh seeder:
+ Untuk menjalankan seluruh seeder:
 
+```
 php artisan db:seed
+```
 
+ Atau:
 
-Atau:
-
+```
 php artisan migrate --seed
+```
 
-9. Role & Permission
+---
 
-Project menggunakan role berikut:
+ # 10\. Role & Permission
 
+ Project menggunakan **Spatie Permission**.
+
+ Role utama:
+
+```
 super_admin
 user
 staff_it
 kepala_bagian
+```
 
+---
+
+ ## 10.1 Super Admin
+
+ Role:
+
+```
 super_admin
+```
 
-Super Admin mendapatkan akses penuh melalui mekanisme Gate::before().
+ Super Admin mendapatkan akses penuh melalui mekanisme:
 
-Super Admin tidak membutuhkan permission satu per satu.
+```
+Gate::before()
+```
 
-Role:
+ Super Admin tidak membutuhkan permission satu per satu.
 
-super_admin
+ Role `super_admin` sengaja tidak diberikan permission melalui `role_has_permissions`.
 
+---
+
+ ## 10.2 User
+
+ Role:
+
+```
 user
+```
 
-User biasa menggunakan role:
+ User biasa tidak mendapatkan permission resource secara default.
 
-user
+ Permission user dapat diberikan secara individual oleh Super Admin melalui:
 
+```
+User Management
+```
 
-Secara default user tidak memiliki permission resource.
+ Permission individual disimpan melalui:
 
-Permission dapat diberikan secara individual oleh Super Admin melalui User Management.
+```
+model_has_permissions
+```
 
+---
+
+ ## 10.3 Staff IT
+
+ Role:
+
+```
 staff_it
+```
 
-Staff IT menggunakan:
+ Staff IT mendapatkan permission modul Permintaan IT melalui role.
 
-staff_it
+ Permission:
 
-
-Staff IT mendapatkan permission modul Permintaan IT melalui role.
-
-Permission:
-
+```
 itrequest.view
 itrequest.create
 itrequest.update
 itrequest.delete
+```
 
+ Permission tersebut diberikan melalui:
+
+```
+role_has_permissions
+```
+
+---
+
+ ## 10.4 Kepala Bagian
+
+ Role:
+
+```
 kepala_bagian
+```
 
-Kepala Bagian menggunakan:
+ Kepala Bagian mendapatkan permission untuk proses approval Permintaan IT.
 
-kepala_bagian
+ Permission:
 
-
-Permission:
-
+```
 itrequest.approval.view
 itrequest.approval.approve
 itrequest.approval.reject
+```
 
+ Permission tersebut digunakan untuk:
 
-Permission tersebut digunakan untuk melihat, menyetujui, dan menolak Permintaan IT bawahannya.
+ - Melihat request bawahan
+- Menyetujui request
+- Menolak request
 
-10. Konfigurasi Akun Seeder
+ Permission diberikan melalui:
 
-Credential akun hasil seeder dapat diatur melalui .env.
+```
+role_has_permissions
+```
 
-Super Admin
+---
+
+ # 11\. Permission Resource
+
+ Permission resource utama menggunakan format:
+
+```
+resource.action
+```
+
+ Contoh:
+
+```
+mstasset.view
+mstasset.create
+mstasset.update
+mstasset.delete
+```
+
+ Resource yang memiliki permission antara lain:
+
+```
+mstasset
+mstdepartemen
+mstkaryawan
+mstlokasi
+mstperusahaan
+mstruangan
+mstsambungan
+mstsoftware
+mstsoftwarelicense
+mstvendor
+trxcctvassignment
+trxmutasiasset
+trxpabxassignment
+trxretireasset
+trxserviceasset
+trxsoftwareassignment
+```
+
+ Setiap resource memiliki permission:
+
+```
+.view
+.create
+.update
+.delete
+```
+
+---
+
+ # 12\. Konfigurasi Akun Seeder
+
+ Credential akun hasil seeder dapat dikonfigurasi melalui `.env`.
+
+ ## Super Admin
+
+ Tambahkan:
+
+```
 SEED_SUPER_ADMIN_NAME=Super Admin
 SEED_SUPER_ADMIN_EMAIL=superadmin@example.com
 SEED_SUPER_ADMIN_PASSWORD=12345678
+```
 
-User
+ ## User
+
+ Tambahkan:
+
+```
 SEED_USER_NAME=User
 SEED_USER_EMAIL=user@example.com
 SEED_USER_PASSWORD=12345678
+```
 
+ Setelah konfigurasi, jalankan:
 
-Setelah konfigurasi, jalankan:
-
+```
 php artisan db:seed
+```
 
+ Seeder menggunakan:
 
-Seeder akan melakukan updateOrCreate, sehingga akun dapat dibuat atau diperbarui.
+```
+updateOrCreate()
+```
 
-Untuk environment production, gunakan password yang kuat dan jangan menggunakan password contoh.
+ sehingga akun dapat dibuat atau diperbarui tanpa membuat data user duplikat.
 
-11. Konfigurasi Storage
+ > Untuk environment production, gunakan password yang kuat dan jangan menggunakan password contoh.
 
-Project menggunakan filesystem Laravel dan media library.
+---
 
-Setelah instalasi, jalankan:
+ # 13\. Konfigurasi Storage
 
+ Project menggunakan filesystem Laravel dan media library.
+
+ Setelah instalasi, jalankan:
+
+```
 php artisan storage:link
+```
 
+ Jika berhasil, Laravel akan membuat symbolic link:
 
-Jika berhasil, Laravel akan membuat symbolic link:
-
+```
 public/storage
+```
 
-12. Build Frontend
+ Command ini diperlukan terutama untuk fitur yang menggunakan upload atau media.
 
-Untuk production/build:
+---
 
+ # 14\. Build Frontend
+
+ Untuk membuat production build:
+
+```
 npm run build
+```
 
+ Untuk development:
 
-Untuk development:
-
+```
 npm run dev
+```
 
+ Project menggunakan:
 
-Project menggunakan:
-
+```
 Vite
 Tailwind CSS
 Livewire
 Filament
+```
 
-13. Clear Cache
+---
 
-Setelah konfigurasi atau perubahan environment, jalankan:
+ # 15\. Clear Laravel Cache
 
+ Setelah melakukan perubahan konfigurasi `.env`, permission, atau aplikasi, jalankan:
+
+```
 php artisan optimize:clear
+```
 
+ Untuk cache component Filament:
 
-Untuk Filament:
-
+```
 php artisan filament:cache-components
+```
 
+ Jika terjadi masalah cache atau permission:
 
-Jika terjadi masalah permission/cache, jalankan kembali:
-
+```
 php artisan optimize:clear
+```
 
-14. Menjalankan Project
+ Kemudian login kembali.
 
-Jalankan Laravel:
+---
 
+ # 16\. Menjalankan Project
+
+ Jalankan Laravel:
+
+```
 php artisan serve
+```
 
+ Jika berhasil akan tersedia pada:
 
-Default URL:
-
+```
 http://127.0.0.1:8000
+```
 
+ Untuk development frontend, gunakan terminal kedua:
 
-Untuk development frontend, gunakan terminal kedua:
-
+```
 npm run dev
+```
 
+ Sehingga:
 
-Sehingga:
-
-Terminal 1
+```
+Terminal 1:
 php artisan serve
+```
 
-Terminal 2
+```
+Terminal 2:
 npm run dev
+```
 
-15. Sistem Login
+---
 
-Project menggunakan satu sistem login utama dengan guard:
+ # 17\. Sistem Login
 
+ Project menggunakan **satu sistem login utama** dengan guard:
+
+```
 web
+```
 
+ Login tersedia melalui:
 
-Login tersedia melalui route Laravel:
-
+```
 /login
+```
 
+ Authentication utama menggunakan route:
 
-Setelah login, halaman tujuan ditentukan berdasarkan role.
+```
+routes/auth.php
+```
 
-Super Admin / User
+ Tidak menggunakan sistem login terpisah untuk Kepala Bagian.
 
-User dapat diarahkan ke:
+---
 
-/admin
+ ## 17.1 User Biasa
 
+ Setelah login, user biasa diarahkan ke:
 
-atau:
-
+```
 /permintaan-it
+```
 
+ User dapat mengakses fitur Permintaan IT sesuai authorization yang dimiliki.
 
-tergantung permission yang dimiliki.
+---
 
-Kepala Bagian
+ ## 17.2 Kepala Bagian
 
-Kepala Bagian diarahkan ke:
+ User dengan role:
 
+```
+kepala_bagian
+```
+
+ diarahkan ke:
+
+```
 /kepala-bagian/permintaan-it
+```
 
-16. Filament Admin Panel
+ Halaman ini digunakan untuk proses approval Permintaan IT.
 
-Panel utama aplikasi menggunakan Filament.
+---
 
-URL:
+ ## 17.3 Super Admin
 
+ Super Admin dapat mengakses:
+
+```
+/admin
+```
+
+ Super Admin memiliki akses penuh melalui mekanisme authorization aplikasi.
+
+---
+
+ # 18\. Filament Admin Panel
+
+ Panel administrator menggunakan:
+
+```
+Filament
+```
+
+ URL:
+
+```
 http://127.0.0.1:8000/admin
+```
 
+ Konfigurasi panel berada pada:
 
-Middleware:
+```
+app/Providers/Filament/AdminPanelProvider.php
+```
 
-RedirectUnauthorizedFilamentUser
+---
 
+ ## RedirectUnauthorizedFilamentUser
 
-memiliki aturan utama:
+ Middleware:
 
-super_admin dapat masuk Filament.
+```
+app/Http/Middleware/RedirectUnauthorizedFilamentUser.php
+```
 
-staff_it dapat masuk Filament.
+ memiliki aturan utama:
 
-User yang memiliki permission dapat masuk Filament.
+ - `super_admin` dapat masuk Filament.
+- `staff_it` dapat masuk Filament.
+- User yang memiliki permission dapat masuk Filament.
+- User tanpa permission tidak dapat menggunakan panel Filament.
+- User tanpa permission akan diarahkan ke:
 
-User tanpa permission diarahkan ke halaman Permintaan IT.
+```
+/permintaan-it
+```
 
-User tanpa permission tidak diberikan akses ke panel Filament.
+ Hal ini membuat user biasa tanpa permission resource tetap dapat menggunakan modul Permintaan IT di luar Filament.
 
-17. Modul Aplikasi
-Dashboard
+---
 
-Dashboard menyediakan informasi seperti:
+ # 19\. Modul Aplikasi
 
-Statistik Asset
+ ## Dashboard
 
-Asset berdasarkan perusahaan
+ Dashboard menyediakan informasi seperti:
 
-Asset berdasarkan departemen
+ - Total/statistik Asset
+- Asset berdasarkan perusahaan
+- Asset berdasarkan departemen
+- Asset berdasarkan lokasi
+- Status Asset
+- Jenis Asset
+- Service Asset berdasarkan tahun
+- CCTV Assignment
+- PABX Location
+- Software Assignment
+- Software License
+- Warranty Asset
 
-Asset berdasarkan lokasi
+ Widget dashboard berada pada:
 
-Status Asset
+```
+app/Filament/Widgets/
+```
 
-Jenis Asset
+---
 
-Service Asset
+ ## Asset Management
 
-CCTV Assignment
+ Modul Asset Management meliputi:
 
-PABX Location
+ - Asset
+- Mutasi Asset
+- Service Asset
+- Retire Asset
+- CCTV Assignment
+- PABX Assignment
 
-Software Assignment
+ Resource Filament berada pada:
 
-Software License
+```
+app/Filament/Resources/
+```
 
-Warranty Asset
+---
 
-Asset Management
+ ## Master Data
 
-Modul asset:
+ Master Data meliputi:
 
-Asset
+ - Departemen
+- Karyawan
+- Kepala Bagian
+- Perusahaan
+- Lokasi
+- Ruangan
+- Vendor
+- Sambungan
+- ISP
 
-Mutasi Asset
+---
 
-Service Asset
+ ## Software Management
 
-Retire Asset
+ Software Management meliputi:
 
-CCTV Assignment
+ - Software
+- Software License
+- Software Assignment
 
-PABX Assignment
+ Project juga menyediakan monitoring:
 
-Master Data
+ - License expiration
+- License overview
+- License summary
+- End of support
+- Software assignment berdasarkan perusahaan
 
-Master data meliputi:
+---
 
-Departemen
+ ## ISP Management
 
-Karyawan
+ ISP Management meliputi:
 
-Kepala Bagian
+ - ISP
+- ISP Bandwidth
+- ISP Downtime
 
-Perusahaan
+ Resource terkait berada pada:
 
-Lokasi
+```
+app/Filament/Resources/MstIsp
+app/Filament/Resources/TrxIspBandwidths
+app/Filament/Resources/TrxIspDowntimes
+```
 
-Ruangan
+---
 
-Vendor
+ ## IT Request
 
-Sambungan
+ Modul Permintaan IT digunakan untuk:
 
-ISP
+ - Membuat permintaan IT
+- Melihat permintaan
+- Mengubah permintaan
+- Menghapus permintaan
+- Menambahkan related user
+- Menambahkan catatan
+- Melihat detail request
+- Proses approval
+- Serah terima
 
-Software Management
+ Route utama:
 
-Meliputi:
+```
+/permintaan-it
+```
 
-Software
+ Controller:
 
-Software License
+```
+app/Http/Controllers/ItRequestController.php
+```
 
-Software Assignment
+ Model utama:
 
-Terdapat monitoring expiration/license dan end of support.
+```
+app/Models/ItRequest.php
+```
 
-ISP Management
+---
 
-Meliputi:
+ ## Kepala Bagian
 
-ISP
+ Kepala Bagian dapat melihat request bawahannya melalui:
 
-ISP Bandwidth
-
-ISP Downtime
-
-IT Request
-
-Modul Permintaan IT digunakan untuk:
-
-Membuat permintaan IT
-
-Melihat permintaan
-
-Mengubah permintaan
-
-Menghapus permintaan
-
-Menambahkan related user
-
-Menambahkan catatan
-
-Proses approval
-
-Serah terima
-
-Kepala Bagian
-
-Kepala Bagian dapat melihat request bawahannya melalui:
-
+```
 /kepala-bagian/permintaan-it
+```
 
+ Fitur utama:
 
-Fitur utama:
+ - Melihat request
+- Melihat detail request
+- Approve request
+- Reject request
 
-Melihat request
+ Controller:
 
-Melihat detail request
+```
+app/Http/Controllers/KepalaBagian/ItRequestApprovalController.php
+```
 
-Approve request
+---
 
-Reject request
+ ## User Management
 
+ Super Admin dapat mengelola user melalui:
+
+```
 User Management
+```
 
-Super Admin dapat mengelola user dan permission melalui:
+ Resource:
 
-User Management
+```
+app/Filament/Resources/UserManagements/
+```
 
+ User Management digunakan untuk mengatur:
 
-Permission user dapat diberikan secara individual.
+ - User
+- Role
+- Permission
+- Permission individual
 
-Activity Log
+---
 
-Project menggunakan activity log untuk mencatat aktivitas/perubahan data.
+ ## Activity Log
 
-Konfigurasi tersedia pada:
+ Project menggunakan activity log untuk mencatat aktivitas/perubahan data.
 
+ Konfigurasi:
+
+```
 config/activitylog.php
+```
 
-18. Struktur Project Penting
+ Migration:
 
-Struktur utama project:
+```
+database/migrations/2026_09_07_035411_change_subject_id_to_string_in_activity_log_table.php
+```
 
+---
+
+ # 20\. Struktur Project Penting
+
+ Struktur utama project:
+
+```
 app/
+├── Console/
+├── Exports/
 ├── Filament/
-│   ├── Resources/
-│   ├── Pages/
+│   ├── Exports/
 │   ├── Forms/
+│   ├── Pages/
+│   ├── Resources/
 │   ├── Tables/
 │   └── Widgets/
 │
@@ -625,13 +957,15 @@ app/
 │
 ├── Livewire/
 ├── Models/
+│   └── Concerns/
 ├── Policies/
-└── Providers/
+├── Providers/
+└── View/
 
 database/
+├── factories/
 ├── migrations/
-├── seeders/
-└── factories/
+└── seeders/
 
 resources/
 ├── css/
@@ -639,136 +973,265 @@ resources/
 └── views/
 
 routes/
-├── web.php
-├── auth.php
 ├── api.php
-└── console.php
+├── auth.php
+├── console.php
+└── web.php
+```
 
-19. File Penting
+---
 
-Beberapa file utama yang perlu diketahui developer:
+ # 21\. File Penting
 
+ Beberapa file utama yang perlu diketahui developer:
+
+```
 .env
+.env.example
 composer.json
+composer.lock
 package.json
+package-lock.json
 vite.config.js
 tailwind.config.js
 artisan
+```
 
+---
 
-Konfigurasi Filament:
+ ## Konfigurasi Filament
 
+```
 app/Providers/Filament/AdminPanelProvider.php
+```
 
+---
 
-Role & Permission:
+ ## Role & Permission
 
+```
 database/seeders/RolePermissionSeeder.php
+```
 
+---
 
-User Seeder:
+ ## User Seeder
 
+```
 database/seeders/UserSeeder.php
+```
 
+---
 
-Routing utama:
+ ## Database Seeder
 
+```
+database/seeders/DatabaseSeeder.php
+```
+
+---
+
+ ## Routing Utama
+
+```
 routes/web.php
+```
 
+---
 
-Middleware Filament:
+ ## Authentication
 
+```
+routes/auth.php
+```
+
+---
+
+ ## Middleware Filament
+
+```
 app/Http/Middleware/RedirectUnauthorizedFilamentUser.php
+```
 
+---
 
-Middleware role:
+ ## Middleware Role
 
+```
 app/Http/Middleware/CheckRole.php
+```
 
-20. Troubleshooting
-SQLSTATE Connection Refused
+---
 
-Contoh:
+ ## IT Request Controller
 
+```
+app/Http/Controllers/ItRequestController.php
+```
+
+---
+
+ ## Kepala Bagian Controller
+
+```
+app/Http/Controllers/KepalaBagian/ItRequestApprovalController.php
+```
+
+---
+
+ # 22\. Troubleshooting
+
+ ## Error: SQLSTATE Connection Refused
+
+ Contoh:
+
+```
 SQLSTATE[HY000] [2002] Connection refused
+```
 
+ Solusi:
 
-Periksa:
+ Pastikan:
 
-MySQL sudah running.
+ - MySQL berjalan.
+- Database sudah dibuat.
+- `DB_HOST` benar.
+- `DB_PORT` benar.
+- Username database benar.
+- Password database benar.
+- Nama database pada `.env` benar.
 
-Database sudah dibuat.
+ Setelah memperbaiki `.env`, jalankan:
 
-DB_HOST benar.
-
-DB_PORT benar.
-
-Username/password database benar.
-
-Class Not Found
-
-Jalankan:
-
-composer dump-autoload
-
-
-Kemudian:
-
+```
 php artisan optimize:clear
+```
 
-Vite Manifest Not Found
+---
 
-Jalankan:
+ ## Error: Class Not Found
 
+ Jalankan:
+
+```
+composer dump-autoload
+```
+
+ Kemudian:
+
+```
+php artisan optimize:clear
+```
+
+---
+
+ ## Error: Vite Manifest Not Found
+
+ Jalankan:
+
+```
 npm install
 npm run build
+```
 
-Filament Bermasalah
+ Untuk development:
 
-Jalankan:
+```
+npm run dev
+```
 
+---
+
+ ## Error Filament
+
+ Jalankan:
+
+```
 php artisan filament:cache-components
 php artisan optimize:clear
+```
 
-Permission Tidak Berubah
+ Kemudian coba login kembali.
 
-Clear permission/cache:
+---
 
+ ## Permission Tidak Berubah
+
+ Clear cache:
+
+```
 php artisan optimize:clear
+```
 
+ Pastikan user memiliki role yang benar.
 
-Kemudian login kembali.
+ Periksa juga permission melalui:
 
-Pastikan role dan permission diperiksa melalui User Management.
+```
+User Management
+```
 
-Storage/File Upload Bermasalah
+ Untuk user biasa, permission resource diberikan secara individual.
 
-Jalankan:
+ Untuk Staff IT dan Kepala Bagian, permission tertentu berasal dari role.
 
+---
+
+ ## Storage / File Upload Bermasalah
+
+ Jalankan:
+
+```
 php artisan storage:link
+```
 
-21. Perhatian Database
+ Kemudian:
 
-Jangan sembarangan menjalankan:
+```
+php artisan optimize:clear
+```
 
+---
+
+ # 23\. Perhatian Database
+
+ Jangan sembarangan menjalankan:
+
+```
 php artisan migrate:fresh
+```
 
+ Command tersebut akan:
 
-Command tersebut akan menghapus seluruh tabel database dan membuatnya kembali dari awal.
+ - Menghapus seluruh tabel.
+- Menghapus seluruh data.
+- Menjalankan ulang seluruh migration.
 
-Untuk database yang sudah memiliki data, gunakan:
+ Untuk database yang sudah memiliki data, gunakan:
 
+```
 php artisan migrate
+```
 
+ Jika perlu melakukan perubahan struktur database, buat migration baru:
 
-Jika perlu melakukan perubahan database, buat migration baru:
-
+```
 php artisan make:migration nama_migration
+```
 
-22. Quick Installation
+ Kemudian jalankan:
 
-Jika semua software sudah tersedia:
+```
+php artisan migrate
+```
 
+---
+
+ # 24\. Quick Installation
+
+ Jika semua kebutuhan sudah tersedia:
+
+```
 git clone https://github.com/jamesalejandros/MatapelProject2.git
 
 cd MatapelProject2
@@ -780,59 +1243,149 @@ npm install
 copy .env.example .env
 
 php artisan key:generate
+```
 
+ Konfigurasi database pada:
 
-Konfigurasi database pada .env, kemudian:
+```
+.env
+```
 
+ Kemudian buat database:
+
+```
+CREATE DATABASE matapel_asset;
+```
+
+ Jalankan migration dan seeder:
+
+```
 php artisan migrate --seed
+```
 
+ Buat storage link:
+
+```
 php artisan storage:link
+```
 
+ Clear cache:
+
+```
 php artisan optimize:clear
+```
 
+ Build frontend:
+
+```
 npm run build
+```
 
+ Jalankan Laravel:
+
+```
 php artisan serve
+```
 
+---
 
-Buka:
+ # 25\. URL Aplikasi
 
+ Login:
+
+```
 http://127.0.0.1:8000/login
+```
 
+ Dashboard:
 
-Untuk Filament:
+```
+http://127.0.0.1:8000/dashboard
+```
 
+ Filament Admin Panel:
+
+```
 http://127.0.0.1:8000/admin
+```
 
+ Permintaan IT:
 
-Untuk Permintaan IT:
-
+```
 http://127.0.0.1:8000/permintaan-it
+```
 
+ Kepala Bagian:
 
-Untuk Kepala Bagian:
-
+```
 http://127.0.0.1:8000/kepala-bagian/permintaan-it
+```
 
-23. Development
+ Profile:
 
-Saat melakukan development, gunakan:
+```
+http://127.0.0.1:8000/profile
+```
 
+---
+
+ # 26\. Development Mode
+
+ Untuk menjalankan aplikasi dalam mode development:
+
+ ### Terminal 1
+
+```
 php artisan serve
+```
 
+ ### Terminal 2
 
-dan terminal kedua:
-
+```
 npm run dev
+```
 
+ Setelah perubahan database:
 
-Setelah perubahan pada database:
-
+```
 php artisan migrate
+```
 
+ Setelah perubahan konfigurasi:
 
-Setelah perubahan konfigurasi/cache:
-
+```
 php artisan optimize:clear
+```
 
-End of Guide
+ Setelah perubahan frontend untuk production:
+
+```
+npm run build
+```
+
+---
+
+ # 27\. Catatan Developer
+
+ Beberapa hal penting yang perlu diperhatikan:
+
+ - Jangan menghapus migration lama yang sudah digunakan database.
+- Gunakan migration baru untuk perubahan struktur database.
+- Jangan menjalankan `migrate:fresh` pada database yang berisi data penting.
+- Jangan menyimpan password production di repository.
+- Pastikan `.env` tidak ikut di-commit.
+- Setelah perubahan `.env`, jalankan `php artisan optimize:clear`.
+- Setelah perubahan frontend production, jalankan `npm run build`.
+- Setelah perubahan permission, lakukan clear cache dan login kembali.
+- Permission user biasa diberikan secara individual melalui User Management.
+- `super_admin` mendapatkan akses penuh melalui mekanisme `Gate::before()`.
+- Staff IT menggunakan permission Permintaan IT melalui role `staff_it`.
+- Kepala Bagian menggunakan permission approval melalui role `kepala_bagian`.
+
+---
+
+ # End of Guide
+
+```
+
+```
