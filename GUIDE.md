@@ -285,31 +285,15 @@ database/seeders/
  Seeder utama:
 
 ```
-DatabaseSeeder.php
-MasterSeeder.php
 RolePermissionSeeder.php
 UserSeeder.php
-AdminUserSeeder.php
-ItRequestPermissionSeeder.php
 ```
 
  Seeder yang paling penting untuk sistem permission dan user adalah:
 
 ```
-RolePermissionSeeder.php
-UserSeeder.php
-```
-
- Untuk menjalankan seluruh seeder:
-
-```
-php artisan db:seed
-```
-
- Atau:
-
-```
-php artisan migrate --seed
+php artisan db:seed --class=MasterSeeder
+php artisan db:seed --class=RolePermissionSeeder
 ```
 
 ---
@@ -1385,7 +1369,3 @@ npm run build
 ---
 
  # End of Guide
-
-```
-
-```
