@@ -3,11 +3,14 @@
 namespace App\Filament\Resources\UserManagements;
 
 use App\Filament\Resources\BaseResource;
+
 use App\Filament\Resources\UserManagements\Pages\CreateUserManagement;
 use App\Filament\Resources\UserManagements\Pages\EditUserManagement;
 use App\Filament\Resources\UserManagements\Pages\ListUserManagements;
+
 use App\Filament\Resources\UserManagements\Schemas\UserManagementForm;
 use App\Filament\Resources\UserManagements\Tables\UserManagementsTable;
+
 use App\Models\User;
 
 use BackedEnum;
@@ -24,15 +27,40 @@ class UserManagementResource extends BaseResource
         User::class;
 
 
+    /*
+    |--------------------------------------------------------------------------
+    | SLUG
+    |--------------------------------------------------------------------------
+    |
+    | Paksa URL Resource menjadi:
+    |
+    | /admin/user-managements
+    |
+    | bukan:
+    |
+    | /admin/user-managements/user-management
+    |
+    */
+
+    protected static ?string $slug =
+        'user-managements';
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | PERMISSION PREFIX
+    |--------------------------------------------------------------------------
+    */
+
     protected static string $permissionPrefix =
         'usermanagement';
 
 
-    /**
-     * ==========================================================
-     * NAVIGATION
-     * ==========================================================
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | NAVIGATION
+    |--------------------------------------------------------------------------
+    */
 
     protected static bool $shouldRegisterNavigation =
         true;
@@ -62,18 +90,18 @@ class UserManagementResource extends BaseResource
         0;
 
 
-    /**
-     * ==========================================================
-     * AUTHORIZATION
-     * ==========================================================
-     *
-     * User Management hanya dapat digunakan oleh
-     * super_admin.
-     *
-     * Super Admin tidak dapat dikelola melalui
-     * User Management.
-     */
-
+    /*
+    |--------------------------------------------------------------------------
+    | AUTHORIZATION
+    |--------------------------------------------------------------------------
+    |
+    | User Management hanya dapat digunakan oleh
+    | super_admin.
+    |
+    | Super Admin tidak dapat dikelola melalui
+    | User Management.
+    |
+    */
 
     public static function canViewAny(): bool
     {
@@ -142,11 +170,11 @@ class UserManagementResource extends BaseResource
     }
 
 
-    /**
-     * ==========================================================
-     * FORM
-     * ==========================================================
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | FORM
+    |--------------------------------------------------------------------------
+    */
 
     public static function form(
         Schema $schema
@@ -158,11 +186,11 @@ class UserManagementResource extends BaseResource
     }
 
 
-    /**
-     * ==========================================================
-     * TABLE
-     * ==========================================================
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | TABLE
+    |--------------------------------------------------------------------------
+    */
 
     public static function table(
         Table $table
@@ -174,11 +202,11 @@ class UserManagementResource extends BaseResource
     }
 
 
-    /**
-     * ==========================================================
-     * RELATIONS
-     * ==========================================================
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | RELATIONS
+    |--------------------------------------------------------------------------
+    */
 
     public static function getRelations(): array
     {
@@ -186,11 +214,11 @@ class UserManagementResource extends BaseResource
     }
 
 
-    /**
-     * ==========================================================
-     * PAGES
-     * ==========================================================
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | PAGES
+    |--------------------------------------------------------------------------
+    */
 
     public static function getPages(): array
     {
