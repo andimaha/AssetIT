@@ -16,7 +16,6 @@ use Filament\Actions\DeleteBulkAction;
 
 use Illuminate\Database\Eloquent\Builder;
 
-
 class TrxIspDowntimesTable
 {
     public static function configure(Table $table): Table
@@ -27,6 +26,9 @@ class TrxIspDowntimesTable
 
             ->columns([
 
+                /*
+                 * Vendor
+                 */
                 TextColumn::make(
                     'isp.vendor.NamaVendor'
                 )
@@ -34,6 +36,9 @@ class TrxIspDowntimesTable
                     ->searchable()
                     ->sortable(),
 
+                /*
+                 * ISP
+                 */
                 TextColumn::make(
                     'isp.NamaISP'
                 )
@@ -41,6 +46,9 @@ class TrxIspDowntimesTable
                     ->searchable()
                     ->sortable(),
 
+                /*
+                 * Connection Type
+                 */
                 TextColumn::make(
                     'isp.ConnectionType'
                 )
@@ -48,6 +56,9 @@ class TrxIspDowntimesTable
                     ->searchable()
                     ->sortable(),
 
+                /*
+                 * Media Type
+                 */
                 TextColumn::make(
                     'isp.MediaType'
                 )
@@ -55,6 +66,24 @@ class TrxIspDowntimesTable
                     ->searchable()
                     ->sortable(),
 
+                /*
+                 * Perusahaan
+                 *
+                 * Relasi:
+                 * TrxIspDowntime
+                 *      -> isp
+                 *          -> perusahaan
+                 */
+                TextColumn::make(
+                    'isp.perusahaan.NamaPerusahaan'
+                )
+                    ->label('Perusahaan')
+                    ->searchable()
+                    ->sortable(),
+
+                /*
+                 * Lokasi
+                 */
                 TextColumn::make(
                     'isp.lokasi.NamaLokasi'
                 )
@@ -62,17 +91,26 @@ class TrxIspDowntimesTable
                     ->searchable()
                     ->sortable(),
 
+                /*
+                 * Nomor Tiket
+                 */
                 TextColumn::make('NoTiket')
                     ->label('No. Tiket')
                     ->searchable()
                     ->sortable()
                     ->placeholder('-'),
 
+                /*
+                 * Tanggal Mulai
+                 */
                 TextColumn::make('TanggalMulai')
                     ->label('Mulai')
                     ->dateTime('d/m/Y H:i')
                     ->sortable(),
 
+                /*
+                 * Tanggal Selesai
+                 */
                 TextColumn::make('TanggalSelesai')
                     ->label('Selesai')
                     ->dateTime('d/m/Y H:i')
@@ -81,6 +119,9 @@ class TrxIspDowntimesTable
                         'Masih berlangsung'
                     ),
 
+                /*
+                 * Total Jam
+                 */
                 TextColumn::make('TotalJam')
                     ->label('Total')
                     ->numeric(
@@ -90,6 +131,9 @@ class TrxIspDowntimesTable
                     ->sortable()
                     ->placeholder('-'),
 
+                /*
+                 * Lokasi Putus
+                 */
                 TextColumn::make('LokasiPutus')
                     ->label('Lokasi Putus')
                     ->limit(40)
@@ -100,6 +144,9 @@ class TrxIspDowntimesTable
                     ->searchable()
                     ->toggleable(),
 
+                /*
+                 * Penyebab
+                 */
                 TextColumn::make('Penyebab')
                     ->label('Penyebab')
                     ->limit(50)
@@ -110,6 +157,9 @@ class TrxIspDowntimesTable
                     ->searchable()
                     ->toggleable(),
 
+                /*
+                 * Dampak
+                 */
                 TextColumn::make('Dampak')
                     ->label('Dampak')
                     ->limit(50)
@@ -120,6 +170,9 @@ class TrxIspDowntimesTable
                     ->searchable()
                     ->toggleable(),
 
+                /*
+                 * Status
+                 */
                 TextColumn::make('StatusDowntime')
                     ->label('Status')
                     ->state(
@@ -136,6 +189,9 @@ class TrxIspDowntimesTable
                                 : 'danger'
                     ),
 
+                /*
+                 * Created At
+                 */
                 TextColumn::make('created_at')
                     ->label('Dibuat')
                     ->dateTime('d/m/Y H:i')
@@ -148,6 +204,9 @@ class TrxIspDowntimesTable
 
             ->filters([
 
+                /*
+                 * Filter ISP
+                 */
                 SelectFilter::make('IDISP')
                     ->label('ISP')
                     ->relationship(
@@ -157,6 +216,26 @@ class TrxIspDowntimesTable
                     ->searchable()
                     ->preload(),
 
+                /*
+                 * Filter Perusahaan
+                 *
+                 * Relasi:
+                 * TrxIspDowntime
+                 *      -> isp
+                 *          -> perusahaan
+                 */
+                SelectFilter::make('perusahaan')
+                    ->label('Perusahaan')
+                    ->relationship(
+                        'isp.perusahaan',
+                        'NamaPerusahaan'
+                    )
+                    ->searchable()
+                    ->preload(),
+
+                /*
+                 * Filter Connection Type
+                 */
                 SelectFilter::make('connection_type')
                     ->label('Connection Type')
                     ->options(
@@ -204,6 +283,9 @@ class TrxIspDowntimesTable
                             )
                     ),
 
+                /*
+                 * Filter Media Type
+                 */
                 SelectFilter::make('media_type')
                     ->label('Media Type')
                     ->options(
@@ -251,6 +333,9 @@ class TrxIspDowntimesTable
                             )
                     ),
 
+                /*
+                 * Filter Lokasi
+                 */
                 SelectFilter::make('lokasi')
                     ->label('Lokasi')
                     ->relationship(
@@ -260,6 +345,9 @@ class TrxIspDowntimesTable
                     ->searchable()
                     ->preload(),
 
+                /*
+                 * Filter Downtime Sedang Berlangsung
+                 */
                 Filter::make('sedang_berlangsung')
                     ->label('Sedang Berlangsung')
                     ->query(
@@ -269,6 +357,9 @@ class TrxIspDowntimesTable
                             )
                     ),
 
+                /*
+                 * Filter Downtime Sudah Selesai
+                 */
                 Filter::make('sudah_selesai')
                     ->label('Sudah Selesai')
                     ->query(
@@ -278,6 +369,9 @@ class TrxIspDowntimesTable
                             )
                     ),
 
+                /*
+                 * Filter Periode
+                 */
                 Filter::make('periode')
                     ->label('Periode')
                     ->form([
