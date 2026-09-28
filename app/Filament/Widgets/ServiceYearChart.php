@@ -58,21 +58,69 @@ class ServiceYearChart extends ChartWidget
             );
         }
 
+        /*
+        |--------------------------------------------------------------------------
+        | Ambil data berdasarkan Tahun + Jenis Service
+        |--------------------------------------------------------------------------
+        */
+
         $services = $query
 
             ->selectRaw(
                 'YEAR(TanggalMasuk) as tahun,
+                COALESCE(JenisService, "Tidak Ada Jenis") as jenis,
                 COUNT(*) as total'
             )
 
-            ->groupBy('tahun')
+            ->groupBy(
+                'tahun',
+                'jenis'
+            )
 
             ->orderBy('tahun')
 
-            ->pluck(
-                'total',
-                'tahun'
-            );
+            ->get();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Daftar Tahun
+        |--------------------------------------------------------------------------
+        */
+
+        $years = $services
+
+            ->pluck('tahun')
+
+            ->unique()
+
+            ->sort()
+
+            ->values();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Daftar Jenis Service
+        |--------------------------------------------------------------------------
+        */
+
+        $jenisServices = $services
+
+            ->pluck('jenis')
+
+            ->unique()
+
+            ->sort()
+
+            ->values();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Warna Setiap Jenis Service
+        |--------------------------------------------------------------------------
+        */
 
         $colors = [
             '#3B82F6', // Biru
@@ -89,41 +137,71 @@ class ServiceYearChart extends ChartWidget
             '#A855F7', // Violet
         ];
 
-        $backgroundColors = [];
 
-        foreach ($services as $index => $total) {
-            $backgroundColors[] = $colors[$index % count($colors)];
+        /*
+        |--------------------------------------------------------------------------
+        | Buat Dataset Stack Berdasarkan Jenis
+        |--------------------------------------------------------------------------
+        */
+
+        $datasets = [];
+
+        foreach ($jenisServices as $index => $jenis) {
+
+            $data = [];
+
+            foreach ($years as $tahun) {
+
+                $row = $services
+
+                    ->first(
+                        fn ($item) =>
+                            (string) $item->tahun === (string) $tahun
+                            &&
+                            (string) $item->jenis === (string) $jenis
+                    );
+
+                $data[] = $row
+                    ? (int) $row->total
+                    : 0;
+            }
+
+
+            $color = $colors[
+                $index % count($colors)
+            ];
+
+
+            $datasets[] = [
+
+                'label' => $jenis,
+
+                'data' => $data,
+
+                'backgroundColor' => $color,
+
+                'borderColor' => $color,
+
+                'borderWidth' => 1,
+
+                'borderRadius' => 4,
+
+                'stack' => 'service',
+
+            ];
         }
+
 
         return [
 
-            'datasets' => [
+            'datasets' => $datasets,
 
-                [
+            'labels' => $years
 
-                    'label' => 'Jumlah Service',
-
-                    'data' => $services
-                        ->values()
-                        ->toArray(),
-
-                    'backgroundColor' => $backgroundColors,
-
-                    'borderColor' => $backgroundColors,
-
-                    'borderWidth' => 1,
-
-                    'borderRadius' => 8,
-
-                ]
-
-            ],
-
-            'labels' => $services
-
-                ->keys()
-
-                ->map(fn($tahun) => (string) $tahun)
+                ->map(
+                    fn ($tahun) =>
+                        (string) $tahun
+                )
 
                 ->toArray(),
 
@@ -144,9 +222,36 @@ class ServiceYearChart extends ChartWidget
 responsive:true,
 
 plugins:{
+
     legend:{
-        display:false
+        display:true,
+        position:'bottom'
     }
+
+},
+
+scales:{
+
+    x:{
+
+        stacked:true
+
+    },
+
+    y:{
+
+        stacked:true,
+
+        beginAtZero:true,
+
+        ticks:{
+
+            precision:0
+
+        }
+
+    }
+
 },
 
 onClick(event,elements,chart)
@@ -157,15 +262,25 @@ onClick(event,elements,chart)
         return;
     }
 
-    let index = elements[0].index;
+
+    let element = elements[0];
+
+    let index = element.index;
+
+    let datasetIndex = element.datasetIndex;
+
 
     let tahun = chart.data.labels[index];
+
+    let jenis = chart.data.datasets[datasetIndex].label;
+
 
     Livewire.dispatch(
         'open-service-year-modal',
         {
             tahun:tahun,
-            company:$wire.filter
+            company:$wire.filter,
+            jenis:jenis
         }
     );
 
