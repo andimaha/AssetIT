@@ -18,12 +18,12 @@ class ItRequestPolicy
 
     public function viewAny(User $user): bool
     {
-        return $user->can('itrequest.view');
+        return true;
     }
 
     public function view(User $user, ItRequest $request): bool
     {
-        if ($user->can('itrequest.view')) {
+        if ($user->hasRole('staff_it')) {
             return true;
         }
 
@@ -38,21 +38,16 @@ class ItRequestPolicy
 
     public function create(User $user): bool
     {
-        return $user->can('itrequest.create');
+        return !empty($user->NIK);
     }
 
     public function update(User $user, ItRequest $request): bool
     {
-        return $user->can('itrequest.update');
+        return $user->hasRole('staff_it');
     }
 
     public function delete(User $user, ItRequest $request): bool
     {
-        return $user->can('itrequest.delete');
-    }
-
-    public function deleteAny(User $user): bool
-    {
-        return $user->can('itrequest.delete');
+        return $user->hasRole('staff_it');
     }
 }

@@ -10,7 +10,6 @@ use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Filament\Tables\Enums\FiltersLayout;
 
 class ItRequestsTable
 {
@@ -22,15 +21,24 @@ class ItRequestsTable
             |--------------------------------------------------------------------------
             | RECORD URL
             |--------------------------------------------------------------------------
+            |
+            | Hanya user yang mempunyai permission UPDATE yang diarahkan
+            | ke halaman Edit ketika klik row.
+            |
             */
 
             ->recordUrl(
-                fn ($record) => ItRequestResource::getUrl(
-                    'edit',
-                    [
-                        'record' => $record,
-                    ]
-                )
+                fn ($record) =>
+                    auth()->check()
+                    &&
+                    ItRequestResource::canEdit($record)
+                        ? ItRequestResource::getUrl(
+                            'edit',
+                            [
+                                'record' => $record,
+                            ]
+                        )
+                        : null
             )
 
             /*
@@ -74,22 +82,6 @@ class ItRequestsTable
             |--------------------------------------------------------------------------
             | EAGER LOAD
             |--------------------------------------------------------------------------
-            |
-            | Struktur relasi terbaru:
-            |
-            | PEMOHON:
-            | User
-            |   -> karyawan
-            |       -> departemen
-            |       -> lokasi
-            |       -> kepalaBagian
-            |           -> user
-            |
-            | APPROVAL:
-            | ItRequestApproval
-            |   -> approver
-            |       -> karyawan
-            |
             */
 
             ->modifyQueryUsing(
@@ -109,15 +101,8 @@ class ItRequestsTable
 
                         /*
                         |--------------------------------------------------------------------------
-                        | KEPALA BAGIAN PEMOHON
+                        | KEPALA BAGIAN
                         |--------------------------------------------------------------------------
-                        |
-                        | Tidak lagi menggunakan:
-                        |
-                        | pemohon.kepalaBagian
-                        |
-                        | karena kepalaBagian() pada User bukan relationship.
-                        |
                         */
 
                         'pemohon.karyawan.kepalaBagian.user',
@@ -158,15 +143,6 @@ class ItRequestsTable
                         |--------------------------------------------------------------------------
                         | APPROVAL
                         |--------------------------------------------------------------------------
-                        |
-                        | ItRequestApproval sekarang menggunakan:
-                        |
-                        | approver_id
-                        |
-                        | sehingga relasi yang benar adalah:
-                        |
-                        | approval.approver
-                        |
                         */
 
                         'approval.approver.karyawan',
@@ -180,35 +156,12 @@ class ItRequestsTable
             |--------------------------------------------------------------------------
             | GLOBAL SEARCH
             |--------------------------------------------------------------------------
-            |
-            | Search mencakup:
-            |
-            | - No Request
-            | - Pemohon
-            | - NIK Pemohon
-            | - Email Pemohon
-            | - Departemen
-            | - Jenis Permintaan
-            | - Permintaan
-            | - Keterangan
-            | - Asset
-            | - Bagian Terkait
-            | - Kepala Bagian
-            | - Approver
-            | - Penyelesai
-            |
             */
 
             ->searchable()
 
             ->modifyQueryUsing(
                 function ($query) {
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | AMBIL SEARCH
-                    |--------------------------------------------------------------------------
-                    */
 
                     $search =
                         request()->query('tableSearch')
@@ -220,12 +173,6 @@ class ItRequestsTable
                     }
 
                     $search = trim($search);
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | SEARCH GROUP
-                    |--------------------------------------------------------------------------
-                    */
 
                     $query->where(
                         function ($query) use ($search) {
@@ -440,21 +387,6 @@ class ItRequestsTable
                             |--------------------------------------------------------------------------
                             | KEPALA BAGIAN
                             |--------------------------------------------------------------------------
-                            |
-                            | Struktur terbaru:
-                            |
-                            | it_requests
-                            |   -> pemohon
-                            |       -> karyawan
-                            |           -> kepalaBagian
-                            |               -> user
-                            |
-                            | Tidak menggunakan:
-                            |
-                            | pemohon.kepalaBagian
-                            |
-                            | karena User::kepalaBagian() bukan relationship.
-                            |
                             */
 
                             $query->orWhereHas(
@@ -496,10 +428,6 @@ class ItRequestsTable
                             |--------------------------------------------------------------------------
                             | APPROVER
                             |--------------------------------------------------------------------------
-                            |
-                            | Search berdasarkan user yang benar-benar
-                            | melakukan approval.
-                            |
                             */
 
                             $query->orWhereHas(
@@ -582,23 +510,11 @@ class ItRequestsTable
 
             ->columns([
 
-                /*
-                |--------------------------------------------------------------------------
-                | NO
-                |--------------------------------------------------------------------------
-                */
-
                 TextColumn::make('No')
                     ->label('NO')
                     ->rowIndex()
                     ->weight('bold')
                     ->width('70px'),
-
-                /*
-                |--------------------------------------------------------------------------
-                | NO REQUEST
-                |--------------------------------------------------------------------------
-                */
 
                 TextColumn::make('NoRequest')
                     ->label('NO. REQUEST')
@@ -623,15 +539,8 @@ class ItRequestsTable
                     ->wrap()
                     ->lineClamp(5),
 
-                /*
-                |--------------------------------------------------------------------------
-                | PEMOHON
-                |--------------------------------------------------------------------------
-                */
-
                 TextColumn::make('pemohon.name')
                     ->label('PEMOHON')
-
                     ->formatStateUsing(
                         function (
                             $state,
@@ -664,7 +573,6 @@ class ItRequestsTable
 
                         }
                     )
-
                     ->searchable(
                         query: function (
                             $query,
@@ -703,27 +611,15 @@ class ItRequestsTable
 
                         }
                     )
-
                     ->sortable()
-
                     ->width('220px')
-
                     ->wrap()
-
                     ->lineClamp(5),
-
-                /*
-                |--------------------------------------------------------------------------
-                | DEPARTEMEN
-                |--------------------------------------------------------------------------
-                */
 
                 TextColumn::make(
                     'pemohon.karyawan.departemen.NamaDept'
                 )
-
                     ->label('DEPARTEMEN')
-
                     ->formatStateUsing(
                         function (
                             $state,
@@ -741,7 +637,6 @@ class ItRequestsTable
 
                         }
                     )
-
                     ->searchable(
                         query: function (
                             $query,
@@ -763,25 +658,14 @@ class ItRequestsTable
 
                         }
                     )
-
                     ->width('180px')
-
                     ->wrap()
-
                     ->lineClamp(5),
-
-                /*
-                |--------------------------------------------------------------------------
-                | JENIS PERMINTAAN
-                |--------------------------------------------------------------------------
-                */
 
                 TextColumn::make(
                     'jenis_permintaan_display'
                 )
-
                     ->label('JENIS')
-
                     ->state(
                         function ($record) {
 
@@ -807,11 +691,8 @@ class ItRequestsTable
 
                         }
                     )
-
                     ->badge()
-
                     ->color('violet')
-
                     ->searchable(
                         query: function (
                             $query,
@@ -833,31 +714,16 @@ class ItRequestsTable
 
                         }
                     )
-
                     ->width('180px')
-
                     ->wrap()
-
                     ->lineClamp(5),
 
-                /*
-                |--------------------------------------------------------------------------
-                | PERMINTAAN
-                |--------------------------------------------------------------------------
-                */
-
                 TextColumn::make('Permintaan')
-
                     ->label('PERMINTAAN')
-
                     ->limit(80)
-
                     ->wrap()
-
                     ->lineClamp(5)
-
                     ->width('300px')
-
                     ->searchable(
                         query: function (
                             $query,
@@ -873,16 +739,8 @@ class ItRequestsTable
                         }
                     ),
 
-                /*
-                |--------------------------------------------------------------------------
-                | ASSET IT
-                |--------------------------------------------------------------------------
-                */
-
                 TextColumn::make('assets')
-
                     ->label('ASSET IT')
-
                     ->formatStateUsing(
                         function (
                             $state,
@@ -916,8 +774,7 @@ class ItRequestsTable
                                             if (
                                                 $namaAsset === ''
                                             ) {
-                                                return
-                                                    $noAsset;
+                                                return $noAsset;
                                             }
 
                                             return
@@ -931,7 +788,6 @@ class ItRequestsTable
 
                         }
                     )
-
                     ->searchable(
                         query: function (
                             $query,
@@ -975,25 +831,14 @@ class ItRequestsTable
 
                         }
                     )
-
                     ->width('250px')
-
                     ->wrap()
-
                     ->lineClamp(5),
-
-                /*
-                |--------------------------------------------------------------------------
-                | BAGIAN TERKAIT
-                |--------------------------------------------------------------------------
-                */
 
                 TextColumn::make(
                     'relatedUsers.name'
                 )
-
                     ->label('BAGIAN TERKAIT')
-
                     ->formatStateUsing(
                         function (
                             $state,
@@ -1051,7 +896,6 @@ class ItRequestsTable
 
                         }
                     )
-
                     ->searchable(
                         query: function (
                             $query,
@@ -1090,35 +934,15 @@ class ItRequestsTable
 
                         }
                     )
-
                     ->placeholder('-')
-
                     ->width('300px')
-
                     ->wrap()
-
                     ->lineClamp(5),
-
-                /*
-                |--------------------------------------------------------------------------
-                | KEPALA BAGIAN
-                |--------------------------------------------------------------------------
-                |
-                | Struktur terbaru:
-                |
-                | pemohon
-                |   -> karyawan
-                |       -> kepalaBagian
-                |           -> user
-                |
-                */
 
                 TextColumn::make(
                     'pemohon.karyawan.kepalaBagian.user.name'
                 )
-
                     ->label('KEPALA BAGIAN')
-
                     ->formatStateUsing(
                         function (
                             $state,
@@ -1158,7 +982,6 @@ class ItRequestsTable
 
                         }
                     )
-
                     ->searchable(
                         query: function (
                             $query,
@@ -1218,33 +1041,19 @@ class ItRequestsTable
 
                         }
                     )
-
                     ->width('240px')
-
                     ->wrap()
-
                     ->lineClamp(5),
-
-                /*
-                |--------------------------------------------------------------------------
-                | APPROVAL KEPALA BAGIAN
-                |--------------------------------------------------------------------------
-                */
 
                 TextColumn::make(
                     'approval.status'
                 )
-
                     ->label(
                         'APPROVAL KEPALA BAGIAN'
                     )
-
                     ->badge()
-
                     ->formatStateUsing(
-                        function (
-                            $state
-                        ) {
+                        function ($state) {
 
                             return match ($state) {
 
@@ -1268,11 +1077,8 @@ class ItRequestsTable
 
                         }
                     )
-
                     ->color(
-                        function (
-                            $state
-                        ) {
+                        function ($state) {
 
                             return match ($state) {
 
@@ -1292,157 +1098,26 @@ class ItRequestsTable
 
                         }
                     )
-
-                    ->placeholder(
-                        'Belum Ada'
-                    )
-
+                    ->placeholder('Belum Ada')
                     ->width('220px')
-
                     ->wrap()
-
                     ->lineClamp(5),
 
-                /*
-                |--------------------------------------------------------------------------
-                | APPROVER
-                |--------------------------------------------------------------------------
-                |
-                | User yang benar-benar melakukan approval.
-                |
-                */
-
-                // TextColumn::make(
-                //     'approval.approver.name'
-                // )
-
-                //     ->label(
-                //         'APPROVER'
-                //     )
-
-                //     ->formatStateUsing(
-                //         function (
-                //             $state,
-                //             $record
-                //         ) {
-
-                //             $approver =
-                //                 $record
-                //                     ->approval
-                //                     ?->approver;
-
-                //             if (! $approver) {
-                //                 return '-';
-                //             }
-
-                //             $nama =
-                //                 $approver
-                //                     ->karyawan
-                //                     ?->Nama
-                //                 ??
-                //                 $approver
-                //                     ->name
-                //                 ??
-                //                 '-';
-
-                //             $nik =
-                //                 $approver
-                //                     ->NIK
-                //                 ??
-                //                 '-';
-
-                //             return
-                //                 $nama
-                //                 . ' | NIK: '
-                //                 . $nik;
-
-                //         }
-                //     )
-
-                //     ->searchable(
-                //         query: function (
-                //             $query,
-                //             string $search
-                //         ): void {
-
-                //             $query->whereHas(
-                //                 'approval.approver',
-                //                 function ($query) use ($search) {
-
-                //                     $query->where(
-                //                         function ($query) use ($search) {
-
-                //                             $query
-                //                                 ->where(
-                //                                     'users.name',
-                //                                     'like',
-                //                                     "%{$search}%"
-                //                                 )
-                //                                 ->orWhere(
-                //                                     'users.NIK',
-                //                                     'like',
-                //                                     "%{$search}%"
-                //                                 )
-                //                                 ->orWhere(
-                //                                     'users.email',
-                //                                     'like',
-                //                                     "%{$search}%"
-                //                                 );
-
-                //                         }
-                //                     );
-
-                //                 }
-                //             );
-
-                //         }
-                //     )
-
-                //     ->width('240px')
-
-                //     ->wrap()
-
-                //     ->lineClamp(5),
-
-                /*
-                |--------------------------------------------------------------------------
-                | TANGGAL APPROVAL
-                |--------------------------------------------------------------------------
-                */
-
                 TextColumn::make(
-    'approval.approved_at'
-)
-
-    ->label(
-        'TANGGAL APPROVAL'
-    )
-
-    ->date(
-        'd/m/Y'
-    )
-
-    ->placeholder('-')
-
-    ->sortable()
-
-    ->width('150px')
-
-    ->wrap()
-
-    ->lineClamp(5),
-
-
-                /*
-                |--------------------------------------------------------------------------
-                | PENYELESAI
-                |--------------------------------------------------------------------------
-                */
+                    'approval.approved_at'
+                )
+                    ->label(
+                        'TANGGAL APPROVAL'
+                    )
+                    ->date('d/m/Y')
+                    ->placeholder('-')
+                    ->sortable()
+                    ->width('150px')
+                    ->wrap()
+                    ->lineClamp(5),
 
                 TextColumn::make('penyelesai.name')
-
                     ->label('PENYELESAI')
-
                     ->formatStateUsing(
                         function (
                             $state,
@@ -1463,7 +1138,6 @@ class ItRequestsTable
 
                         }
                     )
-
                     ->searchable(
                         query: function (
                             $query,
@@ -1502,29 +1176,15 @@ class ItRequestsTable
 
                         }
                     )
-
                     ->placeholder('-')
-
                     ->sortable()
-
                     ->width('220px')
-
                     ->wrap()
-
                     ->lineClamp(5),
 
-                /*
-                |--------------------------------------------------------------------------
-                | STATUS REQUEST
-                |--------------------------------------------------------------------------
-                */
-
                 TextColumn::make('Status')
-
                     ->label('STATUS')
-
                     ->badge()
-
                     ->formatStateUsing(
                         fn ($state) => match ($state) {
 
@@ -1555,7 +1215,6 @@ class ItRequestsTable
 
                         }
                     )
-
                     ->color(
                         fn ($state) => match ($state) {
 
@@ -1582,27 +1241,14 @@ class ItRequestsTable
 
                         }
                     )
-
                     ->sortable()
-
                     ->width('140px')
-
                     ->wrap()
-
                     ->lineClamp(5),
 
-                /*
-                |--------------------------------------------------------------------------
-                | SERAH TERIMA
-                |--------------------------------------------------------------------------
-                */
-
                 TextColumn::make('SerahTerima')
-
                     ->label('SERAH TERIMA')
-
                     ->badge()
-
                     ->formatStateUsing(
                         function (
                             $state,
@@ -1625,7 +1271,6 @@ class ItRequestsTable
 
                         }
                     )
-
                     ->color(
                         function (
                             $state,
@@ -1648,96 +1293,44 @@ class ItRequestsTable
 
                         }
                     )
-
                     ->sortable()
-
                     ->width('200px')
-
                     ->wrap()
-
                     ->lineClamp(5),
 
-                /*
-                |--------------------------------------------------------------------------
-                | TANGGAL SERAH TERIMA
-                |--------------------------------------------------------------------------
-                */
-
                 TextColumn::make(
-    'TanggalSerahTerima'
-)
-
-    ->label(
-        'TANGGAL SERAH TERIMA'
-    )
-
-    ->date(
-        'd/m/Y'
-    )
-
-    ->placeholder('-')
-
-    ->sortable()
-
-    ->width('150px')
-
-    ->wrap()
-
-    ->lineClamp(5),
-
-
-                /*
-                |--------------------------------------------------------------------------
-                | RENCANA SELESAI
-                |--------------------------------------------------------------------------
-                */
+                    'TanggalSerahTerima'
+                )
+                    ->label(
+                        'TANGGAL SERAH TERIMA'
+                    )
+                    ->date('d/m/Y')
+                    ->placeholder('-')
+                    ->sortable()
+                    ->width('150px')
+                    ->wrap()
+                    ->lineClamp(5),
 
                 TextColumn::make(
                     'RencanaSelesai'
                 )
-
                     ->label(
                         'RENCANA SELESAI'
                     )
-
                     ->date('d/m/Y')
-
                     ->placeholder('-')
-
                     ->sortable()
-
                     ->width('160px')
-
                     ->wrap()
-
                     ->lineClamp(5),
 
-                /*
-                |--------------------------------------------------------------------------
-                | TANGGAL REQUEST
-                |--------------------------------------------------------------------------
-                */
-
-                TextColumn::make(
-    'created_at'
-)
-
-    ->label(
-        'DIAJUKAN'
-    )
-
-    ->date(
-        'd/m/Y'
-    )
-
-    ->sortable()
-
-    ->width('150px')
-
-    ->wrap()
-
-    ->lineClamp(5),
-
+                TextColumn::make('created_at')
+                    ->label('DIAJUKAN')
+                    ->date('d/m/Y')
+                    ->sortable()
+                    ->width('150px')
+                    ->wrap()
+                    ->lineClamp(5),
 
             ])
 
@@ -1749,23 +1342,12 @@ class ItRequestsTable
 
             ->filters([
 
-                /*
-                |--------------------------------------------------------------------------
-                | FILTER JENIS PERMINTAAN
-                |--------------------------------------------------------------------------
-                |
-                | JenisPermintaan adalah many-to-many.
-                |
-                */
-
                 SelectFilter::make(
                     'jenis_permintaan'
                 )
-
                     ->label(
                         'Jenis Permintaan'
                     )
-
                     ->options([
 
                         'hardware' =>
@@ -1781,9 +1363,7 @@ class ItRequestsTable
                             'Lainnya',
 
                     ])
-
                     ->multiple()
-
                     ->query(
                         function (
                             $query,
@@ -1817,25 +1397,12 @@ class ItRequestsTable
                         }
                     ),
 
-                /*
-                |--------------------------------------------------------------------------
-                | FILTER APPROVAL KEPALA BAGIAN
-                |--------------------------------------------------------------------------
-                |
-                | Approval berada di tabel:
-                |
-                | it_request_approvals
-                |
-                */
-
                 SelectFilter::make(
                     'approval_status'
                 )
-
                     ->label(
                         'Approval Kepala Bagian'
                     )
-
                     ->options([
 
                         'pending' =>
@@ -1848,7 +1415,6 @@ class ItRequestsTable
                             'Ditolak',
 
                     ])
-
                     ->query(
                         function (
                             $query,
@@ -1882,20 +1448,12 @@ class ItRequestsTable
                         }
                     ),
 
-                /*
-                |--------------------------------------------------------------------------
-                | FILTER STATUS REQUEST
-                |--------------------------------------------------------------------------
-                */
-
                 SelectFilter::make(
                     'Status'
                 )
-
                     ->label(
                         'Status Request'
                     )
-
                     ->options([
 
                         'diajukan' =>
@@ -1917,7 +1475,6 @@ class ItRequestsTable
                             'Dibatalkan',
 
                     ])
-
                     ->query(
                         function (
                             $query,
@@ -1942,20 +1499,12 @@ class ItRequestsTable
                         }
                     ),
 
-                /*
-                |--------------------------------------------------------------------------
-                | FILTER SERAH TERIMA
-                |--------------------------------------------------------------------------
-                */
-
                 SelectFilter::make(
                     'SerahTerima'
                 )
-
                     ->label(
                         'Serah Terima'
                     )
-
                     ->options([
 
                         '1' =>
@@ -1965,7 +1514,6 @@ class ItRequestsTable
                             'Belum / Menunggu Serah Terima',
 
                     ])
-
                     ->query(
                         function (
                             $query,
@@ -1982,12 +1530,6 @@ class ItRequestsTable
                                 return;
                             }
 
-                            /*
-                            |--------------------------------------------------------------------------
-                            | SUDAH DITERIMA
-                            |--------------------------------------------------------------------------
-                            */
-
                             if (
                                 $value === '1'
                             ) {
@@ -2000,12 +1542,6 @@ class ItRequestsTable
                                 return;
 
                             }
-
-                            /*
-                            |--------------------------------------------------------------------------
-                            | BELUM / MENUNGGU SERAH TERIMA
-                            |--------------------------------------------------------------------------
-                            */
 
                             if (
                                 $value === '0'
@@ -2035,64 +1571,52 @@ class ItRequestsTable
                         }
                     ),
 
-                    /*
-|--------------------------------------------------------------------------
-| FILTER OVERDUE / LEWAT RENCANA SELESAI
-|--------------------------------------------------------------------------
-*/
+                SelectFilter::make('overdue')
+                    ->label(
+                        'Rencana Selesai'
+                    )
+                    ->options([
 
-SelectFilter::make('overdue')
+                        '1' =>
+                            'Lewat Rencana Selesai',
 
-    ->label(
-        'Rencana Selesai'
-    )
+                    ])
+                    ->query(
+                        function (
+                            $query,
+                            array $data
+                        ) {
 
-    ->options([
+                            $value =
+                                $data['value']
+                                ?? null;
 
-        '1' =>
-            'Lewat Rencana Selesai',
+                            if (
+                                $value !== '1'
+                            ) {
+                                return;
+                            }
 
-    ])
+                            $query
+                                ->whereNotNull(
+                                    'it_requests.RencanaSelesai'
+                                )
+                                ->whereDate(
+                                    'it_requests.RencanaSelesai',
+                                    '<',
+                                    now()
+                                )
+                                ->whereNotIn(
+                                    'it_requests.Status',
+                                    [
+                                        'selesai',
+                                        'ditolak',
+                                        'dibatalkan',
+                                    ]
+                                );
 
-    ->query(
-        function (
-            $query,
-            array $data
-        ) {
-
-            $value =
-                $data['value']
-                ?? null;
-
-            if (
-                $value !== '1'
-            ) {
-                return;
-            }
-
-            $query
-                ->whereNotNull(
-                    'it_requests.RencanaSelesai'
-                )
-
-                ->whereDate(
-                    'it_requests.RencanaSelesai',
-                    '<',
-                    now()
-                )
-
-                ->whereNotIn(
-                    'it_requests.Status',
-                    [
-                        'selesai',
-                        'ditolak',
-                        'dibatalkan',
-                    ]
-                );
-
-        }
-    ),
-
+                        }
+                    ),
 
             ])
 
@@ -2100,23 +1624,62 @@ SelectFilter::make('overdue')
             |--------------------------------------------------------------------------
             | RECORD ACTIONS
             |--------------------------------------------------------------------------
+            |
+            | PENTING:
+            |
+            | Jangan menggunakan role:
+            |
+            |   super admin
+            |   staff IT
+            |
+            | sebagai penentu tombol.
+            |
+            | Gunakan permission.
+            |
+            | Karena BaseResource sudah menentukan:
+            |
+            |   itrequest.update
+            |   itrequest.delete
+            |
             */
 
             ->recordActions([
 
-                EditAction::make()
+                /*
+                |--------------------------------------------------------------------------
+                | EDIT
+                |--------------------------------------------------------------------------
+                */
 
+                EditAction::make()
                     ->visible(
-                        fn ($record) =>
+                        fn ($record): bool =>
+                            auth()->check()
+                            &&
+                            auth()
+                                ->user()
+                                ->can('itrequest.update')
+                            &&
                             ItRequestResource::canEdit(
                                 $record
                             )
                     ),
 
-                DeleteAction::make()
+                /*
+                |--------------------------------------------------------------------------
+                | DELETE
+                |--------------------------------------------------------------------------
+                */
 
+                DeleteAction::make()
                     ->visible(
-                        fn ($record) =>
+                        fn ($record): bool =>
+                            auth()->check()
+                            &&
+                            auth()
+                                ->user()
+                                ->can('itrequest.delete')
+                            &&
                             ItRequestResource::canDelete(
                                 $record
                             )
@@ -2135,9 +1698,8 @@ SelectFilter::make('overdue')
                 BulkActionGroup::make([
 
                     DeleteBulkAction::make()
-
                         ->visible(
-                            fn () =>
+                            fn (): bool =>
                                 auth()->check()
                                 &&
                                 auth()
@@ -2145,6 +1707,8 @@ SelectFilter::make('overdue')
                                     ->can(
                                         'itrequest.delete'
                                     )
+                                &&
+                                ItRequestResource::canDeleteAny()
                         ),
 
                 ]),
