@@ -292,7 +292,7 @@ UserSeeder.php
  Seeder yang paling penting untuk sistem permission dan user adalah:
 
 ```
-php artisan db:seed --class=MasterSeeder
+php artisan db:seed --class=UserSeeder
 php artisan db:seed --class=RolePermissionSeeder
 ```
 
