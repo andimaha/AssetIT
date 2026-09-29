@@ -13,16 +13,11 @@ class StoreItRequestRequest extends FormRequest
      * AUTHORIZE
      * ==========================================================
      *
-     * User yang sudah login diperbolehkan membuat ItRequest.
-     *
-     * Permission / role Filament TIDAK digunakan di sini.
-     *
-     * ItRequest merupakan fitur client/user yang dapat digunakan
-     * oleh user tanpa harus diberikan permission khusus.
+     * User harus memiliki izin membuat ItRequest.
      */
     public function authorize(): bool
     {
-        return $this->user() !== null;
+        return $this->user()?->can('create', ItRequest::class) ?? false;
     }
 
     /**

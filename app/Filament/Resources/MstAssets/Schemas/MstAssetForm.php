@@ -64,11 +64,13 @@ class MstAssetForm
 
 
 
-                        TextInput::make('Nama')
-
-                            ->label('Nama Asset')
-
-                            ->required(),
+                        Textarea::make('Nama')
+    ->label('Nama Asset')
+    ->required()
+    ->rows(3)
+    ->extraAttributes([
+        'style' => 'resize: both; overflow: auto;',
+    ]),
 
 
 

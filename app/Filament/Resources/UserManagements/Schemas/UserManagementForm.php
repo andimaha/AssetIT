@@ -360,6 +360,7 @@ class UserManagementForm
                         ->searchable()
                         ->preload()
                         ->required()
+                        ->live()
                         ->helperText(
                             'Super Admin dikelola secara khusus dan tidak dapat diberikan melalui form ini.'
                         ),
@@ -442,20 +443,20 @@ class UserManagementForm
     | PERMISSION LIST
     |--------------------------------------------------------------------------
     |
-    | PENTING:
-    |
-    | Nama state dibuat:
+    | Nama state:
     |
     | permissions_mst
     | permissions_trx
     | permissions_itrequest
     |
-    | State tersebut kemudian diisi oleh:
+    | State hanya menyimpan DIRECT PERMISSION user.
     |
-    | EditUserManagement::mutateFormDataBeforeFill()
+    | Permission yang berasal dari Role:
     |
-    | Jadi ketika halaman Edit dibuka, permission yang tersimpan
-    | akan otomatis dicentang kembali.
+    | - tetap ditampilkan
+    | - diberi tanda [ROLE]
+    | - checkbox tidak dapat dimatikan
+    | - tidak dimasukkan ke direct permission
     |
     */
 
@@ -475,21 +476,77 @@ class UserManagementForm
             |--------------------------------------------------------------------------
             | OPTIONS
             |--------------------------------------------------------------------------
-            |
-            | Gunakan nama permission sebagai VALUE.
-            |
-            | Contoh:
-            |
-            | mstuser.view
-            | mstuser.create
-            | mstuser.update
-            | mstuser.delete
-            |
             */
 
             ->options(
-                fn (): array =>
-                    Permission::query()
+                function (
+                    callable $get
+                ) use (
+                    $prefix
+                ): array {
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | ROLE AKTIF
+                    |--------------------------------------------------------------------------
+                    */
+
+                    $roleName =
+                        $get(
+                            'role'
+                        );
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | PERMISSION DARI ROLE
+                    |--------------------------------------------------------------------------
+                    */
+
+                    $rolePermissions =
+                        collect();
+
+
+                    if (
+                        filled($roleName)
+                    ) {
+
+                        $role =
+                            Role::query()
+                                ->where(
+                                    'guard_name',
+                                    'web'
+                                )
+                                ->where(
+                                    'name',
+                                    $roleName
+                                )
+                                ->first();
+
+                        if (
+                            $role
+                        ) {
+
+                            $rolePermissions =
+                                $role
+                                    ->permissions()
+                                    ->pluck(
+                                        'name'
+                                    )
+                                    ->unique();
+
+                        }
+
+                    }
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | SEMUA PERMISSION
+                    |--------------------------------------------------------------------------
+                    */
+
+                    return Permission::query()
                         ->where(
                             'guard_name',
                             'web'
@@ -557,6 +614,8 @@ class UserManagementForm
                         ->mapWithKeys(
                             function (
                                 Permission $permission
+                            ) use (
+                                $rolePermissions
                             ): array {
 
                                 $parts =
@@ -652,16 +711,144 @@ class UserManagementForm
                                     };
 
 
+                                /*
+                                |--------------------------------------------------------------------------
+                                | CEK PERMISSION DARI ROLE
+                                |--------------------------------------------------------------------------
+                                */
+
+                                $isRolePermission =
+                                    $rolePermissions
+                                        ->contains(
+                                            $permission->name
+                                        );
+
+
+                                /*
+                                |--------------------------------------------------------------------------
+                                | LABEL
+                                |--------------------------------------------------------------------------
+                                */
+
+                                $label =
+                                    "{$resourceLabel} — {$actionLabel}";
+
+
+                                if (
+                                    $isRolePermission
+                                ) {
+
+                                    $label .=
+                                        ' [ROLE]';
+
+                                }
+
+
                                 return [
 
                                     $permission->name =>
-                                        "{$resourceLabel} — {$actionLabel}",
+                                        $label,
 
                                 ];
 
                             }
                         )
-                        ->toArray()
+
+                        ->toArray();
+
+                }
+            )
+
+            /*
+            |--------------------------------------------------------------------------
+            | DISABLE PERMISSION YANG BERASAL DARI ROLE
+            |--------------------------------------------------------------------------
+            |
+            | Ini bagian penting.
+            |
+            | Permission [ROLE] tidak boleh dimatikan dari User Management.
+            |
+            | Contoh:
+            |
+            | Role:
+            |   staff_it
+            |
+            | Memiliki:
+            |   itrequest.create
+            |   itrequest.view
+            |
+            | Maka:
+            |
+            |   IT Request — Create [ROLE]  ☑ disabled
+            |   IT Request — Read   [ROLE]  ☑ disabled
+            |
+            | Sedangkan permission direct tetap editable.
+            |
+            */
+
+            ->disableOptionWhen(
+                function (
+                    string|int $value,
+                    callable $get
+                ) use (
+                    $prefix
+                ): bool {
+
+                    $roleName =
+                        $get(
+                            'role'
+                        );
+
+                    if (
+                        blank($roleName)
+                    ) {
+
+                        return false;
+                    }
+
+                    $role =
+                        Role::query()
+                            ->where(
+                                'guard_name',
+                                'web'
+                            )
+                            ->where(
+                                'name',
+                                $roleName
+                            )
+                            ->first();
+
+                    if (
+                        ! $role
+                    ) {
+
+                        return false;
+                    }
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | CARI PERMISSION
+                    |--------------------------------------------------------------------------
+                    */
+
+                    $permissionName =
+                        (string) $value;
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | PASTIKAN PERMISSION BERASAL DARI ROLE
+                    |--------------------------------------------------------------------------
+                    */
+
+                    return $role
+                        ->permissions()
+                        ->where(
+                            'name',
+                            $permissionName
+                        )
+                        ->exists();
+
+                }
             )
 
             /*
@@ -669,16 +856,10 @@ class UserManagementForm
             | STATE
             |--------------------------------------------------------------------------
             |
-            | Jangan gunakan relationship() di sini.
+            | CheckboxList hanya menyimpan DIRECT PERMISSION.
             |
-            | CheckboxList membaca state dari:
-            |
-            | permissions_mst
-            | permissions_trx
-            | permissions_itrequest
-            |
-            | State tersebut sudah disediakan oleh
-            | mutateFormDataBeforeFill().
+            | Permission dari Role tidak perlu dimasukkan ke state
+            | karena akses tersebut sudah diberikan oleh Role.
             |
             */
 
@@ -695,7 +876,7 @@ class UserManagementForm
             ->bulkToggleable()
 
             ->helperText(
-                'Pilih tindakan yang diperbolehkan untuk pengguna.'
+                'Permission dengan tanda [ROLE] berasal dari Role dan tidak dapat dimatikan dari User Management. Permission lainnya adalah direct permission pengguna.'
             );
 
     }
