@@ -56,7 +56,7 @@ class ItRequestForm
         |
         | - User biasa       => LOCK
         | - Staff IT         => LOCK
-        | - Kepala Bagian    => LOCK
+        | - Kepala Bagian   => LOCK
         | - User permission  => LOCK
         | - super_admin      => BYPASS
         |
@@ -91,7 +91,7 @@ class ItRequestForm
         |
         | - User biasa       => LOCK
         | - Staff IT         => LOCK
-        | - Kepala Bagian    => LOCK
+        | - Kepala Bagian   => LOCK
         | - User permission  => LOCK
         | - super_admin      => BYPASS
         |
@@ -116,7 +116,7 @@ class ItRequestForm
             return
                 $record
                     ->approval
-                        ?->status === 'rejected';
+                    ?->status === 'rejected';
         };
 
         /*
@@ -134,7 +134,10 @@ class ItRequestForm
         |
         */
 
-        $isRequestLocked = function ($record) use ($isCompletedAndLocked, $isRejectedAndLocked): bool {
+        $isRequestLocked = function ($record) use (
+            $isCompletedAndLocked,
+            $isRejectedAndLocked
+        ): bool {
 
             return
                 $isCompletedAndLocked($record)
@@ -189,6 +192,7 @@ class ItRequestForm
                             )
                             ->getOptionLabelFromRecordUsing(
                                 function (User $record): string {
+
                                     return
                                         ($record->NIK ?? '-')
                                         . ' | '
@@ -225,6 +229,7 @@ class ItRequestForm
                             )
                             ->getOptionLabelFromRecordUsing(
                                 function ($record): string {
+
                                     return
                                         $record->Nama
                                         ?? $record->name
@@ -255,6 +260,7 @@ class ItRequestForm
                                 'assets',
                                 'NoAssetIT',
                                 modifyQueryUsing: function (Builder $query) {
+
                                     $query->with([
                                         'karyawan.departemen',
                                     ]);
@@ -267,11 +273,11 @@ class ItRequestForm
                                         $record
                                             ->karyawan
                                             ?->departemen
-                                                ?->NamaDept
+                                            ?->NamaDept
                                         ?? $record
                                             ->karyawan
                                             ?->departemen
-                                                ?->NamaDepartemen
+                                            ?->NamaDepartemen
                                         ?? '-';
 
                                     return
@@ -282,7 +288,7 @@ class ItRequestForm
                                         . (
                                             $record
                                                 ->karyawan
-                                                    ?->Nama
+                                                ?->Nama
                                             ?? '-'
                                         )
                                         . ' | '
@@ -334,11 +340,6 @@ class ItRequestForm
                                                                         |--------------------------------------------------------------------------
                                                                         | SEARCH DEPARTEMEN
                                                                         |--------------------------------------------------------------------------
-                                                                        |
-                                                                        | Database menggunakan kolom NamaDept.
-                                                                        | Jangan query NamaDepartemen karena kolom tersebut
-                                                                        | tidak ada di tabel mstdepartemen.
-                                                                        |
                                                                         */
 
                                                                         $query->where(
@@ -361,11 +362,11 @@ class ItRequestForm
                                                     $asset
                                                         ->karyawan
                                                         ?->departemen
-                                                            ?->NamaDept
+                                                        ?->NamaDept
                                                     ?? $asset
                                                         ->karyawan
                                                         ?->departemen
-                                                            ?->NamaDepartemen
+                                                        ?->NamaDepartemen
                                                     ?? '-';
 
                                                 return [
@@ -377,7 +378,7 @@ class ItRequestForm
                                                         . (
                                                             $asset
                                                                 ->karyawan
-                                                                    ?->Nama
+                                                                ?->Nama
                                                             ?? '-'
                                                         )
                                                         . ' | '
@@ -451,6 +452,7 @@ class ItRequestForm
                             )
                             ->getOptionLabelFromRecordUsing(
                                 function (User $record): string {
+
                                     $nik =
                                         $record->NIK
                                         ?? '-';
@@ -463,11 +465,11 @@ class ItRequestForm
                                         $record
                                             ->karyawan
                                             ?->departemen
-                                                ?->NamaDept
+                                            ?->NamaDept
                                         ?? $record
                                             ->karyawan
                                             ?->departemen
-                                                ?->NamaDepartemen
+                                            ?->NamaDepartemen
                                         ?? '-';
 
                                     return
@@ -510,7 +512,7 @@ class ItRequestForm
                                     $approver =
                                         $record
                                             ?->approval
-                                                ?->approver;
+                                            ?->approver;
 
                                     if (!$approver) {
                                         return '-';
@@ -523,7 +525,7 @@ class ItRequestForm
                                     $nama =
                                         $approver
                                             ->karyawan
-                                                ?->Nama
+                                            ?->Nama
                                         ?? $approver->name
                                         ?? '-';
 
@@ -550,8 +552,8 @@ class ItRequestForm
                                 function ($state, $record): string {
 
                                     return match (
-                                    $record
-                                        ?->approval
+                                        $record
+                                            ?->approval
                                             ?->status
                                     ) {
 
@@ -566,7 +568,6 @@ class ItRequestForm
 
                                         default =>
                                             'Belum Ada',
-
                                     };
                                 }
                             )
@@ -592,7 +593,7 @@ class ItRequestForm
                                         $record
                                             ?->approval
                                             ?->approved_at
-                                                ?->format(
+                                            ?->format(
                                                 'd/m/Y H:i'
                                             )
                                         ?? '-';
@@ -619,7 +620,7 @@ class ItRequestForm
                                     return
                                         $record
                                             ?->approval
-                                                ?->catatan
+                                            ?->catatan
                                         ?? '-';
                                 }
                             )
@@ -646,6 +647,23 @@ class ItRequestForm
                         |--------------------------------------------------------------------------
                         | PENYELESAI
                         |--------------------------------------------------------------------------
+                        |
+                        | PENTING:
+                        |
+                        | Jangan menggunakan relationship() untuk field ini.
+                        |
+                        | Field ini hanya digunakan untuk MENAMPILKAN siapa
+                        | yang menyelesaikan request sekaligus menyimpan ID.
+                        |
+                        | Dengan options() kita memastikan Filament tidak
+                        | menampilkan ID mentah seperti:
+                        |
+                        |     8
+                        |
+                        | tetapi menampilkan:
+                        |
+                        |     Andi Mahawijaya - 4124021421
+                        |
                         */
 
                         Select::make(
@@ -654,66 +672,149 @@ class ItRequestForm
                             ->label(
                                 'Yang Menyelesaikan'
                             )
-                            ->relationship(
-                                'penyelesai',
-                                'name',
-                                modifyQueryUsing:
-                                function (Builder $query) {
-                                    $query->whereHas(
-                                        'permissions',
-                                        function ($permissionQuery) {
 
-                                            $permissionQuery
-                                                ->where(
-                                                    'name',
-                                                    'itrequest.update'
-                                                )
-                                                ->where(
-                                                    'guard_name',
-                                                    'web'
-                                                );
-                                        }
-                                    );
+                            ->options(
+                                function (): array {
+
+                                    return User::query()
+                                        ->with([
+                                            'karyawan',
+                                        ])
+                                        ->whereHas(
+                                            'permissions',
+                                            function (Builder $query) {
+
+                                                $query
+                                                    ->where(
+                                                        'name',
+                                                        'itrequest.update'
+                                                    )
+                                                    ->where(
+                                                        'guard_name',
+                                                        'web'
+                                                    );
+                                            }
+                                        )
+                                        ->get()
+                                        ->mapWithKeys(
+                                            function (User $user): array {
+
+                                                $nama =
+                                                    $user
+                                                        ->karyawan
+                                                        ?->Nama
+                                                    ?? $user->name
+                                                    ?? '-';
+
+                                                $nik =
+                                                    $user->NIK
+                                                    ?? '-';
+
+                                                return [
+                                                    (string) $user->getKey() =>
+                                                        "{$nama} - {$nik}",
+                                                ];
+                                            }
+                                        )
+                                        ->toArray();
                                 }
                             )
-                            ->getOptionLabelFromRecordUsing(
-                                function (User $record): string {
+
+                            /*
+                            |--------------------------------------------------------------------------
+                            | LABEL FALLBACK
+                            |--------------------------------------------------------------------------
+                            |
+                            | Jika ID yang tersimpan ternyata tidak lagi masuk
+                            | query options, tetap ambil user berdasarkan ID
+                            | agar tidak tampil sebagai angka mentah.
+                            |
+                            */
+
+                            ->getOptionLabelUsing(
+                                function ($value): ?string {
+
+                                    if (
+                                        blank($value)
+                                    ) {
+                                        return null;
+                                    }
+
+                                    $user =
+                                        User::query()
+                                            ->with([
+                                                'karyawan',
+                                            ])
+                                            ->find($value);
+
+                                    if (!$user) {
+                                        return null;
+                                    }
+
+                                    $nama =
+                                        $user
+                                            ->karyawan
+                                            ?->Nama
+                                        ?? $user->name
+                                        ?? '-';
+
+                                    $nik =
+                                        $user->NIK
+                                        ?? '-';
+
                                     return
-                                        ($record->NIK ?? '-')
-                                        . ' | '
-                                        . (
-                                            $record
-                                                ->karyawan
-                                                    ?->Nama
-                                            ?? $record->name
-                                        );
+                                        "{$nama} - {$nik}";
                                 }
                             )
-                            ->searchable([
-                                'name',
-                                'email',
-                                'NIK',
-                            ])
+
+                            ->searchable()
+
                             ->preload()
+
                             ->default(
-                                fn(): ?int =>
+                                fn (): ?int =>
                                     auth()->id()
                             )
+
                             ->afterStateHydrated(
-                                function (Select $component, $state): void {
+                                function (
+                                    Select $component,
+                                    $state
+                                ): void {
+
+                                    /*
+                                    |--------------------------------------------------------------------------
+                                    | JIKA BELUM ADA PENYELESAI
+                                    |--------------------------------------------------------------------------
+                                    */
 
                                     if (
                                         blank($state)
                                         &&
                                         auth()->check()
                                     ) {
+
                                         $component->state(
                                             auth()->id()
                                         );
                                     }
                                 }
                             )
+
+                            /*
+                            |--------------------------------------------------------------------------
+                            | TETAP TIDAK DAPAT DIUBAH DARI FORM
+                            |--------------------------------------------------------------------------
+                            */
+
                             ->disabled()
+
+                            /*
+                            |--------------------------------------------------------------------------
+                            | VALUE TETAP DIKIRIM SAAT SAVE
+                            |--------------------------------------------------------------------------
+                            */
+
                             ->dehydrated(),
 
                         /*
@@ -736,7 +837,7 @@ class ItRequestForm
                                         $record
                                         && $record
                                             ->approval
-                                                ?->status === 'approved'
+                                            ?->status === 'approved'
                                     ) {
 
                                         $options = [
@@ -753,6 +854,7 @@ class ItRequestForm
                                         if (
                                             $record->Status === 'diajukan'
                                         ) {
+
                                             $options = [
                                                 'diajukan' =>
                                                     'Diajukan',
@@ -771,6 +873,7 @@ class ItRequestForm
                                                 true
                                             )
                                         ) {
+
                                             $options = [
                                                 $record->Status =>
                                                     $record->Status === 'disetujui'
@@ -814,7 +917,7 @@ class ItRequestForm
                                         ||
                                         $record
                                             ->approval
-                                                ?->status !== 'approved'
+                                            ?->status !== 'approved'
                                     ) {
                                         return false;
                                     }
@@ -834,7 +937,10 @@ class ItRequestForm
                             ->required()
 
                             ->disabled(
-                                function ($record) use ($isCompletedAndLocked, $isRejectedAndLocked): bool {
+                                function ($record) use (
+                                    $isCompletedAndLocked,
+                                    $isRejectedAndLocked
+                                ): bool {
 
                                     if (
                                         $isCompletedAndLocked(
@@ -859,7 +965,7 @@ class ItRequestForm
                                     return
                                         $record
                                             ->approval
-                                                ?->status
+                                            ?->status
                                         !== 'approved';
                                 }
                             )
@@ -867,7 +973,10 @@ class ItRequestForm
                             ->dehydrated()
 
                             ->helperText(
-                                function ($record) use ($isCompletedAndLocked, $isRejectedAndLocked): ?string {
+                                function ($record) use (
+                                    $isCompletedAndLocked,
+                                    $isRejectedAndLocked
+                                ): ?string {
 
                                     if (!$record) {
                                         return null;
@@ -878,6 +987,7 @@ class ItRequestForm
                                             $record
                                         )
                                     ) {
+
                                         return
                                             'Request sudah selesai dan tidak dapat diedit lagi. Hanya super_admin yang dapat mengubahnya.';
                                     }
@@ -885,13 +995,14 @@ class ItRequestForm
                                     $approvalStatus =
                                         $record
                                             ->approval
-                                                ?->status;
+                                            ?->status;
 
                                     if (
                                         $isRejectedAndLocked(
                                             $record
                                         )
                                     ) {
+
                                         return
                                             'Request telah ditolak oleh Kepala Bagian dan tidak dapat diedit lagi. Hanya super_admin yang dapat mengubahnya.';
                                     }
@@ -899,6 +1010,7 @@ class ItRequestForm
                                     if (
                                         $approvalStatus === 'pending'
                                     ) {
+
                                         return
                                             'Status belum dapat diubah karena masih menunggu persetujuan Kepala Bagian.';
                                     }
@@ -906,6 +1018,7 @@ class ItRequestForm
                                     if (
                                         $approvalStatus !== 'approved'
                                     ) {
+
                                         return
                                             'Request belum mendapatkan persetujuan Kepala Bagian.';
                                     }
@@ -918,11 +1031,15 @@ class ItRequestForm
                             ->live()
 
                             ->afterStateUpdated(
-                                function ($state, callable $set): void {
+                                function (
+                                    $state,
+                                    callable $set
+                                ): void {
 
                                     if (
                                         auth()->check()
                                     ) {
+
                                         $set(
                                             'UserPenyelesaiID',
                                             auth()->id()
@@ -932,6 +1049,7 @@ class ItRequestForm
                                     if (
                                         $state === 'selesai'
                                     ) {
+
                                         $set(
                                             'TanggalSelesai',
                                             now()
@@ -1077,6 +1195,7 @@ class ItRequestForm
                                     if (
                                         $notes->isEmpty()
                                     ) {
+
                                         return
                                             'Belum ada catatan.';
                                     }
@@ -1101,16 +1220,16 @@ class ItRequestForm
                                                     $user
                                                         ?->karyawan
                                                         ?->departemen
-                                                            ?->NamaDept
+                                                        ?->NamaDept
                                                     ?? $user
                                                         ?->karyawan
                                                         ?->departemen
-                                                            ?->NamaDepartemen
+                                                        ?->NamaDepartemen
                                                     ?? '-';
 
                                                 $tanggal =
                                                     $note->created_at
-                                                            ?->format(
+                                                        ?->format(
                                                             'd/m/Y H:i'
                                                         )
                                                     ?? '-';
