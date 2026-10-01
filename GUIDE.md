@@ -1,27 +1,28 @@
-# Matapel IT Asset Management
-# Installation Guide
+ # Matapel IT Asset Management
 
-Dokumen ini berisi langkah-langkah untuk menjalankan project **Matapel IT Asset Management** pada komputer baru.
+ # Installation Guide
 
-Project ini dibangun menggunakan **Laravel, Filament, Livewire, Tailwind CSS, Vite, MySQL, dan Spatie Permission**.
+ Dokumen ini berisi langkah-langkah untuk menjalankan project **Matapel IT Asset Management** pada komputer baru.
 
-Panduan ini ditujukan untuk user/developer yang belum memiliki project sebelumnya.
+ Project ini dibangun menggunakan **Laravel, Filament, Livewire, Tailwind CSS, Vite, MySQL, dan Spatie Permission**.
+
+ Panduan ini ditujukan untuk user/developer yang belum memiliki project sebelumnya.
 
 ---
 
-# 1. Persiapan Awal
+ # 1\. Persiapan Awal
 
-Sebelum menjalankan project, pastikan komputer sudah memiliki beberapa aplikasi berikut.
+ Sebelum menjalankan project, pastikan komputer sudah memiliki beberapa aplikasi berikut.
 
-## Required Software
+ ## Required Software
 
-### 1. PHP
+ ### 1\. PHP
 
-Versi minimum:
+ Versi minimum:
 
-```text
+```
 PHP 8.2+
-````
+```
 
  Cek instalasi:
 
@@ -329,7 +330,11 @@ Gate::before()
 
  Super Admin tidak membutuhkan permission satu per satu.
 
- Role `super_admin` sengaja tidak diberikan permission melalui `role_has_permissions`.
+ Role `super_admin` sengaja tidak diberikan permission melalui:
+
+```
+role_has_permissions
+```
 
 ---
 
@@ -354,6 +359,8 @@ User Management
 ```
 model_has_permissions
 ```
+
+ User juga dapat memperoleh permission melalui Role apabila diberikan Role yang memiliki permission.
 
 ---
 
@@ -413,6 +420,292 @@ itrequest.approval.reject
 ```
 role_has_permissions
 ```
+
+---
+
+ ## 10.5 Role Management
+
+ Super Admin dapat mengelola Role melalui:
+
+```
+Role Management
+```
+
+ Resource:
+
+```
+app/Filament/Resources/RoleManagements/
+```
+
+ Role Management digunakan untuk mengatur:
+
+ - Nama Role
+- Permission yang dimiliki Role
+- Permission Master Data
+- Permission Transaksi
+- Permission IT Request
+- Permission approval IT Request
+
+ Role dan permission menggunakan package:
+
+```
+Spatie Permission
+```
+
+ ### Informasi Role
+
+ Setiap Role memiliki nama yang tersimpan pada tabel:
+
+```
+roles
+```
+
+ Role menggunakan guard:
+
+```
+web
+```
+
+ Nama Role harus unik.
+
+ Contoh Role:
+
+```
+user
+staff_it
+kepala_bagian
+```
+
+ Role:
+
+```
+super_admin
+```
+
+ dikelola secara khusus oleh sistem.
+
+ Nama Role `super_admin` tidak dapat diubah melalui Role Management.
+
+ ### Permission Role
+
+ Permission yang dimiliki oleh Role disimpan melalui:
+
+```
+role_has_permissions
+```
+
+ Permission yang diberikan kepada Role akan menjadi permission efektif bagi user yang memiliki Role tersebut.
+
+ Contoh:
+
+ Role:
+
+```
+staff_it
+```
+
+ memiliki:
+
+```
+itrequest.view
+itrequest.create
+itrequest.update
+itrequest.delete
+```
+
+ Maka user yang memiliki Role `staff_it` mendapatkan permission tersebut melalui Role tanpa perlu memberikan Direct Permission satu per satu.
+
+ ### Pengelompokan Permission
+
+ Role Management mengelompokkan permission menjadi:
+
+ - Master Data
+- Transaksi
+- IT Request
+
+ ### Master Data
+
+ Permission menggunakan prefix:
+
+```
+mst
+```
+
+ Contoh:
+
+```
+mstasset.view
+mstasset.create
+mstasset.update
+mstasset.delete
+```
+
+ ### Transaksi
+
+ Permission menggunakan prefix:
+
+```
+trx
+```
+
+ Contoh:
+
+```
+trxmutasiasset.view
+trxmutasiasset.create
+trxmutasiasset.update
+trxmutasiasset.delete
+```
+
+ ### IT Request
+
+ Permission menggunakan prefix:
+
+```
+itrequest
+```
+
+ Contoh:
+
+```
+itrequest.view
+itrequest.create
+itrequest.update
+itrequest.delete
+```
+
+ Permission approval juga dikelola melalui Role Management:
+
+```
+itrequest.approval.view
+itrequest.approval.approve
+itrequest.approval.reject
+```
+
+ Permission tersebut digunakan untuk proses approval oleh Kepala Bagian.
+
+ ### Permission Approval
+
+ Permission approval memiliki fungsi:
+
+```
+itrequest.approval.view
+```
+
+ Digunakan untuk melihat proses/request yang membutuhkan approval.
+
+```
+itrequest.approval.approve
+```
+
+ Digunakan untuk menyetujui Permintaan IT.
+
+```
+itrequest.approval.reject
+```
+
+ Digunakan untuk menolak Permintaan IT.
+
+ Contoh Role:
+
+```
+kepala_bagian
+```
+
+ dapat diberikan:
+
+```
+itrequest.approval.view
+itrequest.approval.approve
+itrequest.approval.reject
+```
+
+ ### Hubungan Role dengan User
+
+ Hubungan akses dapat digambarkan sebagai:
+
+```
+Role
+  │
+  ├── Permission
+  │
+  └── User
+       │
+       └── Direct Permission
+```
+
+ Permission user dapat berasal dari dua sumber:
+
+```
+Role Permission
++
+Direct Permission
+```
+
+ Contoh:
+
+```
+User A
+│
+├── Role: staff_it
+│   ├── itrequest.view
+│   ├── itrequest.create
+│   ├── itrequest.update
+│   └── itrequest.delete
+│
+└── Direct Permission
+    └── mstasset.view
+```
+
+ Maka User A memiliki permission dari Role `staff_it` dan permission tambahan `mstasset.view`.
+
+ ### Perubahan Permission Role
+
+ Jika permission pada sebuah Role diubah melalui Role Management, perubahan tersebut akan berlaku terhadap user yang memiliki Role tersebut.
+
+ Contoh:
+
+ Sebelumnya:
+
+```
+staff_it
+└── itrequest.view
+```
+
+ Kemudian Super Admin menambahkan:
+
+```
+itrequest.create
+```
+
+ Maka user yang memiliki Role:
+
+```
+staff_it
+```
+
+ akan memperoleh:
+
+```
+itrequest.create
+```
+
+ melalui Role tersebut.
+
+ Permission tersebut tidak perlu ditambahkan lagi sebagai Direct Permission pada setiap user.
+
+ ### Aturan Penting Role Management
+
+ - Role menggunakan guard `web`.
+- Nama Role harus unik.
+- Permission Role disimpan melalui `role_has_permissions`.
+- Permission Role dapat digunakan oleh banyak user.
+- Perubahan permission Role berlaku kepada user yang menggunakan Role tersebut.
+- `super_admin` dikelola secara khusus.
+- Permission `super_admin` tidak bergantung pada `role_has_permissions`.
+- Super Admin mendapatkan akses penuh melalui `Gate::before()`.
+- Role Management digunakan untuk mengatur permission secara terpusat.
+- User Management digunakan untuk mengatur user dan Direct Permission.
 
 ---
 
@@ -895,8 +1188,223 @@ app/Filament/Resources/UserManagements/
 
  - User
 - Role
-- Permission
-- Permission individual
+- Direct Permission
+- Informasi Kepala Bagian
+
+ ### Data Karyawan
+
+ User terhubung dengan data Master Karyawan melalui:
+
+```
+NIK
+```
+
+ Data karyawan diambil dari:
+
+```
+MstKaryawan
+```
+
+ Setelah karyawan dipilih, nama user akan otomatis mengikuti nama pada Master Karyawan.
+
+ NIK user harus unik pada tabel:
+
+```
+users
+```
+
+ ### Kepala Bagian
+
+ Kepala Bagian ditentukan berdasarkan struktur organisasi pada Master Karyawan.
+
+ Informasi Kepala Bagian ditampilkan pada User Management tetapi tidak dapat diubah dari form User Management.
+
+ Untuk mengubah Kepala Bagian, edit data karyawan pada:
+
+```
+Master Karyawan
+```
+
+ ### Role User
+
+ User dapat diberikan Role melalui:
+
+```
+Role
+```
+
+ Role `super_admin` tidak dapat diberikan melalui User Management.
+
+ Role lainnya dapat dipilih sesuai Role yang tersedia pada sistem.
+
+ ### Role Permission dan Direct Permission
+
+ Permission user dapat berasal dari:
+
+```
+Role Permission
++
+Direct Permission
+```
+
+ Permission yang berasal dari Role ditampilkan dengan tanda:
+
+```
+[ROLE]
+```
+
+ Contoh:
+
+```
+IT Request — Create [ROLE]
+IT Request — Read [ROLE]
+```
+
+ Permission `[ROLE]`:
+
+ - Tetap ditampilkan pada User Management.
+- Tidak dapat dimatikan secara individual.
+- Tidak disimpan sebagai Direct Permission user.
+- Mengikuti permission yang dimiliki oleh Role.
+
+ ### Direct Permission
+
+ Permission yang tidak berasal dari Role dapat diberikan langsung kepada user melalui:
+
+```
+Hak Akses
+```
+
+ Direct Permission disimpan melalui:
+
+```
+model_has_permissions
+```
+
+ Direct Permission dapat ditambahkan atau dihapus secara individual oleh Super Admin.
+
+ ### Pengelompokan Permission
+
+ Permission pada User Management dikelompokkan menjadi:
+
+```
+Master Data
+Transaksi
+```
+
+ Permission Master Data menggunakan prefix:
+
+```
+mst
+```
+
+ Permission Transaksi menggunakan prefix:
+
+```
+trx
+```
+
+ Permission IT Request menggunakan prefix:
+
+```
+itrequest
+```
+
+ Permission `[ROLE]` tidak dapat dimatikan dari User Management, sedangkan Direct Permission tetap dapat dikelola secara individual.
+
+---
+
+ ## Role Management
+
+ Super Admin dapat mengelola Role melalui:
+
+```
+Role Management
+```
+
+ Resource:
+
+```
+app/Filament/Resources/RoleManagements/
+```
+
+ Form Role Management:
+
+```
+app/Filament/Resources/RoleManagements/Schemas/RoleManagementForm.php
+```
+
+ Role Management digunakan untuk mengatur:
+
+ - Nama Role
+- Permission Role
+- Permission Master Data
+- Permission Transaksi
+- Permission IT Request
+- Permission approval IT Request
+
+ Permission Role disimpan melalui:
+
+```
+role_has_permissions
+```
+
+ Role menggunakan guard:
+
+```
+web
+```
+
+ Nama Role harus unik.
+
+ Role `super_admin` dikelola secara khusus dan tidak dapat diubah melalui Role Management.
+
+ ### Permission Role
+
+ Contoh Role:
+
+```
+staff_it
+```
+
+ dengan permission:
+
+```
+itrequest.view
+itrequest.create
+itrequest.update
+itrequest.delete
+```
+
+ User yang memiliki Role `staff_it` akan memperoleh permission tersebut melalui Role.
+
+ ### Permission Approval
+
+ Permission approval:
+
+```
+itrequest.approval.view
+itrequest.approval.approve
+itrequest.approval.reject
+```
+
+ digunakan untuk proses approval Permintaan IT oleh Kepala Bagian.
+
+ ### Hubungan Role dan User
+
+```
+Role
+  │
+  ├── Permission
+  │
+  └── User
+       │
+       └── Direct Permission
+```
+
+ Dengan demikian, akses user dapat berasal dari Role maupun Direct Permission.
+
+ Perubahan permission pada Role akan berlaku kepada user yang memiliki Role tersebut.
 
 ---
 
@@ -1011,6 +1519,34 @@ database/seeders/UserSeeder.php
 
 ```
 database/seeders/DatabaseSeeder.php
+```
+
+---
+
+ ## User Management
+
+```
+app/Filament/Resources/UserManagements/
+```
+
+ Form:
+
+```
+app/Filament/Resources/UserManagements/Schemas/UserManagementForm.php
+```
+
+---
+
+ ## Role Management
+
+```
+app/Filament/Resources/RoleManagements/
+```
+
+ Form:
+
+```
+app/Filament/Resources/RoleManagements/Schemas/RoleManagementForm.php
 ```
 
 ---
@@ -1147,7 +1683,7 @@ php artisan optimize:clear
 php artisan optimize:clear
 ```
 
- Pastikan user memiliki role yang benar.
+ Pastikan user memiliki Role yang benar.
 
  Periksa juga permission melalui:
 
@@ -1155,9 +1691,15 @@ php artisan optimize:clear
 User Management
 ```
 
- Untuk user biasa, permission resource diberikan secara individual.
+ Untuk user biasa, permission dapat berasal dari Role maupun Direct Permission.
 
- Untuk Staff IT dan Kepala Bagian, permission tertentu berasal dari role.
+ Untuk Staff IT dan Kepala Bagian, permission tertentu berasal dari Role.
+
+ Jika permission berasal dari Role, periksa juga:
+
+```
+Role Management
+```
 
 ---
 
@@ -1361,10 +1903,34 @@ npm run build
 - Setelah perubahan `.env`, jalankan `php artisan optimize:clear`.
 - Setelah perubahan frontend production, jalankan `npm run build`.
 - Setelah perubahan permission, lakukan clear cache dan login kembali.
-- Permission user biasa diberikan secara individual melalui User Management.
+- User dapat memperoleh permission melalui Role maupun Direct Permission.
+- Permission yang berasal dari Role ditandai `[ROLE]` pada User Management.
+- Permission `[ROLE]` tidak dapat dimatikan secara individual dari User Management.
+- Direct Permission user dapat dikelola secara individual melalui User Management.
+- Permission Role dikelola secara terpusat melalui Role Management.
+- Perubahan permission pada Role akan memengaruhi user yang memiliki Role tersebut.
 - `super_admin` mendapatkan akses penuh melalui mekanisme `Gate::before()`.
-- Staff IT menggunakan permission Permintaan IT melalui role `staff_it`.
-- Kepala Bagian menggunakan permission approval melalui role `kepala_bagian`.
+- `super_admin` tidak bergantung pada permission yang disimpan pada `role_has_permissions`.
+- Role `super_admin` tidak dapat diberikan melalui form User Management.
+- Kepala Bagian ditentukan berdasarkan struktur organisasi pada Master Karyawan.
+- Perubahan Kepala Bagian dilakukan melalui Master Karyawan.
+- Role dan Permission menggunakan guard:
+
+```
+web
+```
+
+ - Permission Role disimpan melalui:
+
+```
+role_has_permissions
+```
+
+ - Direct Permission user disimpan melalui:
+
+```
+model_has_permissions
+```
 
 ---
 
@@ -1372,7 +1938,7 @@ npm run build
 
 ---
 
-# Tambahan
+ # Tambahan
 
  ## Quick Installation — Terminal
 
@@ -1528,4 +2094,3 @@ cp .env.example .env
 ```
 
  Dan **jangan menjalankan `php artisan migrate:fresh`** pada database yang sudah berisi data.
-
