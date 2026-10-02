@@ -14,6 +14,7 @@ use App\Filament\Exports\MstAssetExporter;
 use Filament\Actions\ExportAction;
 use Filament\Tables\Filters\Filter;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Select;
 use Illuminate\Database\Eloquent\Builder;
 
 
@@ -328,6 +329,36 @@ class MstAssetsTable
                                         $date
                                     )
                             );
+
+                    }),
+
+
+                Filter::make('Perusahaan')
+                    ->label('Perusahaan')
+                    ->form([
+
+                        Select::make('perusahaan_id')
+                            ->label('Perusahaan')
+                            ->relationship(
+                                'perusahaan',
+                                'NamaPerusahaan'
+                            )
+                            ->searchable()
+                            ->preload()
+                            ->placeholder('Semua Perusahaan'),
+
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+
+                        return $query->when(
+                            $data['perusahaan_id'] ?? null,
+                            fn (Builder $query, $perusahaanId) =>
+                                $query->whereHas(
+                                    'perusahaan',
+                                    fn (Builder $query) =>
+                                        $query->whereKey($perusahaanId)
+                                )
+                        );
 
                     }),
 

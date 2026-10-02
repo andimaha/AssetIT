@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Filament\Resources\TrxSoftwareAssignments\Tables;
 
 use App\Filament\Resources\TrxSoftwareAssignments\TrxSoftwareAssignmentResource;
@@ -76,19 +77,19 @@ class TrxSoftwareAssignmentsTable
             ->defaultPaginationPageOption('all')
 
             /*
-    |--------------------------------------------------------------------------
-    | GROUPING
-    |--------------------------------------------------------------------------
-    |
-    | Assignment dikelompokkan berdasarkan ID License.
-    |
-    | Header group menampilkan:
-    |
-    | ID LICENSE: ANVOLP002 - 1 - Norton™ Security Premium
-    | ID LICENSE: ANVOLP003 - 1 - Kaspersky Endpoint Security for Business - Advanced
-    | ID LICENSE: APPCLD001 - 2 - Adobe Photoshop
-    |
-    */
+            |--------------------------------------------------------------------------
+            | GROUPING
+            |--------------------------------------------------------------------------
+            |
+            | Assignment dikelompokkan berdasarkan ID License.
+            |
+            | Header group menampilkan:
+            |
+            | ID LICENSE: ANVOLP002 - 1 - Norton™ Security Premium
+            | ID LICENSE: ANVOLP003 - 1 - Kaspersky Endpoint Security for Business - Advanced
+            | ID LICENSE: APPCLD001 - 2 - Adobe Photoshop
+            |
+            */
 
             ->groups([
 
@@ -758,6 +759,100 @@ class TrxSoftwareAssignmentsTable
             */
 
             ->toolbarActions([
+
+                /*
+                |--------------------------------------------------------------------------
+                | EXPAND ALL GROUPS
+                |--------------------------------------------------------------------------
+                |
+                | Mencari tabel Filament terdekat dari tombol,
+                | kemudian mencari semua group yang collapsible.
+                |
+                | Tidak melakukan request Livewire.
+                | Tidak melakukan query database.
+                |
+                */
+
+                Action::make(
+                    'expandAllGroups'
+                )
+
+                    ->label('Expand All')
+
+                    ->icon('heroicon-o-arrows-pointing-out')
+
+                    ->color('gray')
+
+                    ->alpineClickHandler(<<<'JS'
+                        const table = $el.closest('.fi-ta');
+
+                        if (! table) {
+                            return;
+                        }
+
+                        table
+                            .querySelectorAll(
+                                '.fi-ta-group-header.fi-collapsible'
+                            )
+                            .forEach((group) => {
+
+                                if (
+                                    group.classList.contains(
+                                        'fi-collapsed'
+                                    )
+                                ) {
+                                    group.click();
+                                }
+
+                            });
+                    JS),
+
+                /*
+                |--------------------------------------------------------------------------
+                | COLLAPSE ALL GROUPS
+                |--------------------------------------------------------------------------
+                |
+                | Mencari tabel Filament terdekat dari tombol,
+                | kemudian mencari semua group yang collapsible.
+                |
+                | Tidak melakukan request Livewire.
+                | Tidak melakukan query database.
+                |
+                */
+
+                Action::make(
+                    'collapseAllGroups'
+                )
+
+                    ->label('Collapse All')
+
+                    ->icon('heroicon-o-arrows-pointing-in')
+
+                    ->color('gray')
+
+                    ->alpineClickHandler(<<<'JS'
+                        const table = $el.closest('.fi-ta');
+
+                        if (! table) {
+                            return;
+                        }
+
+                        table
+                            .querySelectorAll(
+                                '.fi-ta-group-header.fi-collapsible'
+                            )
+                            .forEach((group) => {
+
+                                if (
+                                    ! group.classList.contains(
+                                        'fi-collapsed'
+                                    )
+                                ) {
+                                    group.click();
+                                }
+
+                            });
+                    JS),
 
                 BulkActionGroup::make([
 
